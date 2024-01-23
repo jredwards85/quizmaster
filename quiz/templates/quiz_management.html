@@ -1,0 +1,368 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quiz Management
+{% endblock %}
+
+{% block body %}
+    <center>
+        <h1>Quiz Management</h1>
+    </center>
+
+    <div class="management-quiz-container">
+        <div class="management-quiz-row">
+            <div class="management-quiz-left">
+                Title
+            </div>
+            <div class="management-quiz-right">
+                {{ quiz_data.title }}
+            </div>
+        </div>
+        <div class="management-quiz-row">
+            <div class="management-quiz-left">
+                Description
+            </div>
+            <div class="management-quiz-right">
+                {% if quiz_data.description %}
+                    {{ quiz_data.description }}
+                {% else %}
+                    <span style="color:brown; font-size: 0.8em;">No description provided.</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="management-quiz-row">
+            <div class="management-quiz-left">
+                Categories
+            </div>
+            <div class="management-quiz-right">
+                {% if quiz_data.category1 %}{{ quiz_data.category1 }}<br>{% endif %}
+                {% if quiz_data.category2 %}{{ quiz_data.category2 }}<br>{% endif %}
+                {% if quiz_data.category3 %}{{ quiz_data.category3 }}<br>{% endif %}
+                {% if quiz_data.category4 %}{{ quiz_data.category4 }}<br>{% endif %}
+                {% if not quiz_data.category1 and not quiz_data.category2 and not quiz_data.category3 and not quiz_data.category4 %}
+                    <span style="color:brown; font-size: 0.8em;">No categories provided.</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="management-quiz-row">
+            <div class="management-quiz-left">
+                Questions
+            </div>
+            <div class="management-quiz-right">
+                {% if questions %}
+                    {{ questions|length }}
+                {% else %}
+                    <span style="color:brown; font-size: 0.8em;">Currently no questions.</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="management-quiz-row">
+            <div class="management-quiz-left">
+                Privacy
+            </div>
+            <div class="management-quiz-right">
+                {% if quiz_data.private %}
+                    Quiz is private.
+                {% else %}
+                    Quiz is public.
+                {% endif %}
+            </div>
+        </div>
+        <div class="management-bottom-row">
+            <div class="management-bottom-row-item">
+                {% if quiz_data.complete %}
+                    <div style="margin-bottom: 5px; font-size: 0.8em;">
+                        Mark For Edit
+                    </div>
+                    <div>
+                        <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                            <input type="hidden" name="mark_edit">
+                            <button type="submit" class="button-svg" style="background-color: transparent;">
+                                <svg width="25" height="25" fill="green" class="pointer" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    {% if not error_status %}
+                        <div style="margin-bottom: 5px; font-size: 0.8em;">
+                            Mark Complete
+                        </div>
+                        <div>
+                            <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                                <input type="hidden" name="mark_complete">
+                                <button type="submit" class="button-svg" onclick="confirmDelete(event, 'mark_complete')" style="background-color: transparent;">
+                                    <svg width="25" height="25" fill="green" class="pointer" viewBox="0 0 16 16">
+                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                    </svg>
+                                </button>
+                            </form>
+                            {% if not quiz_data.edit_only %}
+                            <span style="color: red; font-size: 0.8em;">Once marked complete, only minor changes are possible.</span>
+                            {% endif %}
+                        </div>
+                        
+                    {% else %}
+                        <div style="margin-bottom: 5px; font-size: 0.8em;">
+                            Errors Detected
+                        </div>
+                        <div>
+                            <svg width="25" height="25" fill="red"  viewBox="0 0 16 16" onmouseover="this.style.fill='red'">
+                                <path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                            </svg>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+            {% if not quiz_data.complete %}
+
+            <div class="management-bottom-row-item">
+                <div style="margin-bottom: 5px; font-size: 0.8em;">
+                    Edit Quiz Data
+                </div>
+                <div>
+                    <a href="{% url 'create' name=quiz_data.title_url%}">
+                        <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16" style="background-color: transparent;">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if not quiz_data.complete and not quiz_data.edit_only %}
+                <div class="management-bottom-row-item">
+                    <div style="margin-bottom: 5px; font-size: 0.8em;">
+                        Delete Quiz
+                    </div>
+                    <div>
+                        <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                            <input type="hidden" name="delete_quiz">
+                            <button type="submit" class="button-svg" onclick="confirmDelete(event, 'del_quiz_inst')" style="background-color: transparent;">
+                                <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                            </button>
+                        </form> 
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if quiz_data.complete and quiz_data.edit_only %}
+                <div class="management-bottom-row-item">
+                    <div style="margin-bottom: 5px; font-size: 0.8em;">
+                        Hide Quiz
+                    </div>
+                    <div>
+                        <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                            <input type="hidden" name="hide_quiz">
+                            <button type="submit" class="button-svg" onclick="confirmDelete(event, 'hide_quiz_inst')" style="background-color: transparent;">
+                                <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                                    <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708"/>
+                                </svg>
+                            </button>
+                        </form> 
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+            
+    </div>
+
+    {% if not quiz_data.complete %}
+        {% if error_status %}
+
+            <div class="management-error-alerts-container">
+                <div>
+                    {{ errors|length }} error(s) detected in your questions:<br><br>
+                </div>
+                
+                {% for error in errors %}
+                    <div class="management-alert-container">
+                        <div class="management-alert-container-left">
+                            &bull;
+                        </div>
+                        <div>
+                            {{ error }}
+                        </div> 
+                    </div>
+                {% endfor %}
+                {% if order_issues %}
+                    <div class="management-bottom-row-item">
+                        <div style="margin-bottom: 5px; color: #333;">
+                            Reorder Questions (1, 2, 3 ...)
+                        </div>
+                        <div>
+                            <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                                <input type="hidden" name="reorder">
+                                <button type="submit" class="button-svg" style="background-color: transparent;">
+                                    <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                                    </svg>
+                                </button>
+                            </form> 
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+            
+        {% endif %}
+        {% if warning_status %}
+
+        <div class="management-warning-alerts-container">
+            <div>
+                {{ warnings|length }} warning(s) detected in your questions.<br><br>
+            </div>
+            
+            {% for warning in warnings %}
+                <div class="management-alert-container">
+                    <div class="management-alert-container-left">
+                        &bull; 
+                    </div>
+                    <div>
+                        {{ warning }}
+                    </div>
+                </div>
+                
+            {% endfor %}
+
+            <div class="management-bottom-row" style="color: #333; margin-top: 10px;">
+                {% if duplicates %}
+                    <div class="management-bottom-row-item">
+                        <div style="margin-bottom: 5px;">
+                            Delete Duplicates
+                        </div>
+                        <div>
+                            <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                                <input type="hidden" name="duplicates">
+                                <button type="submit" class="button-svg" style="background-color: transparent;">
+                                    <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                        <path d="M2.037 3.225A.703.703 0 0 1 2 3c0-1.105 2.686-2 6-2s6 .895 6 2a.702.702 0 0 1-.037.225l-1.684 10.104A2 2 0 0 1 10.305 15H5.694a2 2 0 0 1-1.973-1.671L2.037 3.225zm9.89-.69C10.966 2.214 9.578 2 8 2c-1.58 0-2.968.215-3.926.534-.477.16-.795.327-.975.466.18.14.498.307.975.466C5.032 3.786 6.42 4 8 4s2.967-.215 3.926-.534c.477-.16.795-.327.975-.466-.18-.14-.498-.307-.975-.466z"/>
+                                    </svg>
+                                </button>
+                            </form> 
+                        </div>
+                    </div>
+                {% endif%}                
+            </div>
+
+        </div>
+
+    {% endif %}
+    {% endif %}
+
+    {% if not quiz_data.complete  and not quiz_data.edit_only %}
+    <div class="management-container greenbutton-a" style="background-color: transparent; text-align: center;">
+        <a href="{% url 'create' name=quiz_data.title_url number=0 %}" class="greenbutton">
+            Add New Question
+        </a>        
+    </div>
+    {% endif %}
+
+    {% for question in questions %}
+        <div class="management-container">
+            <div class="management-top-row">
+                <div class="management-left-column">
+                    <div class="management-number-container">
+                        {{ question.question_number}}
+                    </div> 
+                </div>
+                <div class="management-right-column">
+                    {{ question.question_text}}<br>
+                </div>
+            </div>
+            <div class="management-middle-row">
+                <div class="management-middle-row-item" {% if question.correct_answer == 1 %}style="background-color: #ABEBC6 ;"{% endif %}>
+                    {{ question.answer1 }}
+                </div>
+                <div class="management-middle-row-item" {% if question.correct_answer == 2 %}style="background-color: #ABEBC6 ;"{% endif %}>
+                    {{ question.answer2 }}
+                </div>
+                <div class="management-middle-row-item" {% if question.correct_answer == 3 %}style="background-color: #ABEBC6 ;"{% endif %}>
+                    {{ question.answer3 }}
+                </div>
+                <div class="management-middle-row-item" {% if question.correct_answer == 4 %}style="background-color: #ABEBC6 ;"{% endif %}>
+                    {{ question.answer4 }}
+                </div>
+            </div>
+            <div class="management-question-type">
+                
+                {% if question.question_type == 1 %}
+
+                    Question type: Text based question
+
+                {% elif question.question_type == 2 %}
+                    {% if question.image %}
+                        <i>Question with image (preview below)</i><br>
+                            <img src="{{ question.image.url }}" style="width: 100px; margin-top: 10px;" alt="Preview image">
+                    {% else %}
+                        <p style="background-color: red; padding: 5px;"><strong>Error: Question with image selected. Missing image file!</strong></p>
+                    {% endif %}
+                    
+                {% else %}
+
+                    {% if question.audio %}
+                            <i>Question with audio (available below)</i><br>
+                                <audio controls style="margin-top: 10px;">
+                                    <source src="{{ question.audio.url }}" type="audio/mp3">
+                                    Your browser does not support the audio element.
+                                </audio>
+                        {% else %}
+                            <p style="background-color: red; padding: 5px;"><strong>Error: Question with audio selected. Missing audio file!</strong></p>
+                        {% endif %}
+
+                {% endif %}
+            </div>
+            
+            {% if not quiz_data.complete %}
+                <div class="management-bottom-row">
+                    <div class="management-bottom-row-item">
+                        <a href="{% url 'create' name=quiz_data.title_url number=question.question_number %}">
+                            <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                            </svg>
+                        </a>
+                    </div>
+                    {% if  not quiz_data.edit_only%}
+                    <div class="management-bottom-row-item">
+                        <form action="{% url 'quiz_management' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                            <input type="hidden" name="question_id" value="{{ question.id }}">
+                            <input type="hidden" name="delete_question">
+                            <button type="submit" class="button-svg" onclick="confirmDelete(event, 'del_quiz_ques')">
+                                <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                            </button>
+                        </form>  
+                    </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+{% endblock %}

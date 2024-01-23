@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Waiting Room
+{% endblock %}
+
+{% block body %}
+    <center>
+        <h1>{{ quiz_data.quiz.title}}</h1>
+    </center>
+    
+    <br>
+
+    {% if quiz_data.play_type == 2 %}
+
+        <form action="{% url 'waiting' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+            <button class="button" name="start" type="submit">Start Quiz</button>
+        </form>
+
+    {% else %}
+
+        <center>
+            <h2>Please Wait</h2>
+            <h3>Quiz starts automatically at host request.</h3>
+
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+                <div style="color: #666; font-style: italic;">
+                    If the page doesn't refresh, click here: &nbsp;
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <a href="{% url 'quiz_redirection' quiz_data.id %}">
+                        <svg width="18" height="18" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            {% if not quiz_data.multichoice_only %}
+                <div style="display: inline-flex; flex-direction: column;">
+                    
+                    <div style="display: inline-flex; flex-direction: row; margin-top: 40px; align-items: center; border: 1px solid #000; border-radius: 5px;">
+                        <div style="display: flex; justify-content: center; padding: 10px;">
+                            <svg width="35" height="35" fill="#333" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            </svg>
+                        </div>
+                        <div style="display:flex; flex-direction: column;">                            
+                            <div style="display:flex; flex-direction: row; align-items: center;">
+                                <div style="padding: 10px;">
+                                    <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" style="vertical-align: middle;">
+                                        <path d="M5 2a.5.5 0 0 1 .5-.5c.862 0 1.573.287 2.06.566.174.099.321.198.44.286.119-.088.266-.187.44-.286A4.165 4.165 0 0 1 10.5 1.5a.5.5 0 0 1 0 1c-.638 0-1.177.213-1.564.434a3.49 3.49 0 0 0-.436.294V7.5H9a.5.5 0 0 1 0 1h-.5v4.272c.1.08.248.187.436.294.387.221.926.434 1.564.434a.5.5 0 0 1 0 1 4.165 4.165 0 0 1-2.06-.566A4.561 4.561 0 0 1 8 13.65a4.561 4.561 0 0 1-.44.285 4.165 4.165 0 0 1-2.06.566.5.5 0 0 1 0-1c.638 0 1.177-.213 1.564-.434.188-.107.335-.214.436-.294V8.5H7a.5.5 0 0 1 0-1h.5V3.228a3.49 3.49 0 0 0-.436-.294A3.166 3.166 0 0 0 5.5 2.5.5.5 0 0 1 5 2m-.704 9.29"/>
+                                    </svg>
+                                </div>
+                                <div style="padding: 10px;">
+                                    3 points: Open Answers
+                                </div>
+                            </div>
+                            <div style="display:flex; flex-direction: row; align-items: center;">
+                                <div style="padding: 10px;">
+                                    <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" style="vertical-align: middle;">
+                                        <path d="M8.5 5.5a.5.5 0 0 0-1 0v3.362l-1.429 2.38a.5.5 0 1 0 .858.515l1.5-2.5A.5.5 0 0 0 8.5 9z"/>
+                                        <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07a7.001 7.001 0 0 0-3.273 12.474l-.602.602a.5.5 0 0 0 .707.708l.746-.746A6.97 6.97 0 0 0 8 16a6.97 6.97 0 0 0 3.422-.892l.746.746a.5.5 0 0 0 .707-.708l-.601-.602A7.001 7.001 0 0 0 9 2.07V1h.5a.5.5 0 0 0 0-1zm1.038 3.018a6.093 6.093 0 0 1 .924 0 6 6 0 1 1-.924 0zM0 3.5c0 .753.333 1.429.86 1.887A8.035 8.035 0 0 1 4.387 1.86 2.5 2.5 0 0 0 0 3.5M13.5 1c-.753 0-1.429.333-1.887.86a8.035 8.035 0 0 1 3.527 3.527A2.5 2.5 0 0 0 13.5 1"/>
+                                </svg>
+                                </div>
+                                <div style="padding: 10px;">
+                                    40 Seconds To Answer  &nbsp;
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: inline-flex; flex-direction: row; margin-top: 15px; align-items: center; border: 1px solid #000; border-radius: 5px;;">
+                        <div style="display: flex; justify-content: center; padding: 10px;">
+                            <svg width="35" height="35" fill="#333" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            </svg>
+                        </div>
+                        <div style="display:flex; flex-direction: column;">
+                            
+                            <div style="display:flex; flex-direction: row; align-items: center;">
+                                <div style="padding: 10px;">
+                                    <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" style="vertical-align: middle;">
+                                        <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5"/>
+                                        <path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635z"/>
+                                    </svg>
+                                </div>
+                                <div style="padding: 10px;">
+                                    1 point: Multiple Choice  &nbsp;
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
+        
+        </center>
+
+
+        
+
+        <!-- Determines if the quiz is ready to start, and forwards the user accordingly -->
+        <script>
+
+            function waitingFwd(quiz_id) {
+                fetch('/forward_waiting', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({quiz_id}),
+                }) 
+                .then(response => response.json())
+                .then(data => {
+                    waitingNextStep(data)
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            function waitingNextStep(data) {
+                if (data.status === 0) {
+                    console.log("The quiz has not yet started.")
+                } else if (data.status === 1) {
+                    // Quiz has started, and user is forwarded.
+                    window.location.href = `/question/${data.quiz_id}`; 
+                } else {
+                    // Should not occur, but redirects from waiting room to results.
+                    window.location.href = `/results/${data.quiz_id}`; 
+                }
+            }
+
+            setInterval(function() {waitingFwd('{{ quiz_data.id }}');
+            }, 5000);
+        </script>
+
+
+
+
+    {% endif %}
+
+{% endblock %}

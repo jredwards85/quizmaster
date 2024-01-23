@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Account
+{% endblock %}
+
+{% block body %}
+
+    <center>
+        <h1>Your Username</h1>
+        
+        <div class="center-align">
+            <p class="profile-name-text-1">
+                {{ request.user.username }} &nbsp; &nbsp;
+            </p>
+            <svg width="30" height="30" fill="orange" class="pointer" viewBox="0 0 16 16" onclick="toggleField('username-edit')" >
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+            </svg>
+        </div>
+
+        <div id="username-edit" style="display: none;">
+            <form action="{% url 'account' %}" method="post">
+                {% csrf_token %}
+                <input id="noSpacesInput" class="input" type="text" name="username" placeholder="Username" value="{{ request.user.username }}" maxlength="50">
+                <button class="button" type="submit" name="update_username">Update</button>
+            </form>
+        </div>
+        
+
+        <h1>Change your password</h1>
+        
+    </center>
+
+    <form action="{% url 'account' %}" method="post" class="login-form">
+        {% csrf_token %}
+        <div class="group">
+            <label for="current_password" class="label">Current password</label>
+            <input type="password" name="current_password" class="input" maxlength="50" required>
+        </div>
+        <div class="group">
+            <label for="new_password" class="label">New password</label>
+            <input type="password" name="new_password" class="input" maxlength="50" required>
+        </div>
+        <div class="group">
+            <label for="password_confirm" class="label">Repeat new password</label>
+            <input type="password" name="new_password_confirm" class="input" maxlength="50" required>
+        </div>
+        <div class="group">
+            <input type="submit" class="button" name="change_password" value="Change Password">
+        </div>
+    </form>
+    
+    <center>
+        
+    <br>
+
+    <h1>Delete account</h1>
+    </center>
+        <p><strong>Warning: This action is irreversible</strong></p>
+        <form id="deleteAccount" action="{% url 'account' %}" method="post">
+            {% csrf_token %}
+            <label for="password" class="label">Password</label>
+            <input type="password" name="password" class="input" required>
+            <button class="button" type="submit" name="delete_account" onclick="confirmDelete(event, 'del_acc')">Delete Account</button>
+        </form>
+    
+
+    <script>
+        document.getElementById('noSpacesInput').addEventListener('input', function(event) {
+            // Remove leading and trailing spaces
+            const inputValue = event.target.value.trim();
+        
+            // Remove any spaces from the input value
+            const sanitizedValue = inputValue.replace(/\s/g, '');
+        
+            // Update the input value without spaces
+            event.target.value = sanitizedValue;
+        });
+        </script>
+
+    
+{% endblock %}
+
+    

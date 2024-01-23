@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block body %}
+
+    <center>
+        <h1>Your Team Name</h1>
+
+            <div class="center-align">
+                <p class="profile-name-text-1">
+                {% if teamname.name|length > 0 %}
+                    {{ teamname.name|title }} &nbsp; &nbsp;
+                {% endif %}
+            </p>
+            <svg width="30" height="30" fill="orange" class="pointer" viewBox="0 0 16 16" onclick="toggleField('team-edit')" >
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+            </svg>
+            </div>
+            
+        
+
+        <div id="team-edit" style="display: none;">
+            <form action="{% url 'profile' %}" method="post">
+                {% csrf_token %}
+                <input class="input" type="text" name="teamname" placeholder="Team name" value="{% if teamname %}{{teamname.name}}{% endif %}" maxlength="50">
+                {% if teamname.name|length > 0 %}
+                    <button class="button" type="submit" name="create">Update team name</button>
+                {% else %}
+                    <button class="button" type="submit" name="create">Save team name</button>
+                {% endif %}
+            </form>
+        </div>
+        <br>
+
+        <h1>Your Team Members</h1>
+        <div class="profile-team-member-container">
+
+            {% for member in teammembers %}
+            <div class="profile-team-member">
+                <div class="profile-team-member-name profile-name-text-2">{{ member.name|title }}</div>
+                
+                <div class="profile-team-member-avatar">
+                    {% if member.avatar %}
+                        <img src="{{ member.avatar.url }}">
+                    {% else %}
+                        <img src="{% static 'images/default/default_avatar.png' %}">
+                    {% endif %}    
+                    <div class="profile-team-member-avatar-edit" onclick="showFieldProfileEdit(`profile-team-member-edit-{{ member.id }}`)">
+                        <svg width="20" height="20" fill="#333" viewBox="0 0 16 16">
+                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                        </svg>
+                    </div>                
+                </div> 
+            </div>
+            {% endfor %}
+
+        </div>
+
+
+        <svg onclick="toggleField('add-member')" width="30" height="30" fill="green" class="pointer" viewBox="0 0 16 16">
+            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664z"/>
+            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+        </svg>
+
+        <br><br>
+
+        <div id="add-member" style="display: none;">
+            <form action="{% url 'profile' %}" method="post">
+                {% csrf_token %}
+                <input class="input" type="text" name="member" placeholder="Enter name" maxlength="50" required>
+                <button class="button" type="submit" name="add_member">Add team member</button>
+            </form>
+            <br>
+        </div>
+
+        <br>
+
+        <h1>Your Public Name</h1>
+        <p>This is the name that will be displayed for any created or hosted quizzes. If no name is given, your username name ({{request.user.username }}) is used instead.</p>
+
+            <div class="center-align">
+                <p class="profile-name-text-1">
+                {% if request.user.public_host_name|length > 0 %}
+                    {{ request.user.public_host_name }} &nbsp; &nbsp;
+                {% else %}
+                    <i>No public name</i> &nbsp; &nbsp;
+                {% endif %}
+            </p>
+            <svg width="30" height="30" fill="orange" class="pointer" viewBox="0 0 16 16" onclick="toggleField('public-name')" >
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+            </svg>
+            </div>
+
+            <div id="public-name" style="display: none;">
+                <form action="{% url 'profile' %}" method="post">
+                    {% csrf_token %}
+                    <input class="input" type="text" name="publicname" placeholder="Enter name" value="{% if request.user.public_host_name %}{{request.user.public_host_name}}{% endif %}" maxlength="50">
+                    {% if request.user.public_host_name|length > 0 %}
+                        <button class="button" type="submit" name="public">Update public name</button>
+                    {% else %}
+                        <button class="button" type="submit" name="public">Save public name</button>
+                    {% endif %}
+                </form>
+                <br>
+            </div>
+            
+        
+        
+
+        <div id="profile-team-member-edit-overlay" class="profile-team-member-edit-overlay" style="display: none">
+                
+            <div>
+                
+                <br>
+                {% for member in teammembers %}
+                    <div id="profile-team-member-edit-{{ member.id }}" class="profile-team-member-edit" style="display: none;">
+
+                        <svg width="30" height="30" fill="#333" class="pointer" viewBox="0 0 16 16" onclick="hideFieldProfileEdit()">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                        </svg>
+
+                        <!-- Change name -->
+                        <h3>Change Team Members Name</h3>
+                        <form action="{% url 'profile' %}" method="post">
+                            {% csrf_token %}
+                            <input name="name" value="{{member.name}}" class="input" maxlength="50" required>
+                            <input type="hidden" name="id" value="{{member.id}}">
+                            <button type="submit" name="change_name" class="button">
+                                Save
+                            </button>
+                        </form>
+
+                        <br>
+
+                        <!-- Avatar -->
+                        <h3>Add/Change Avatar</h3>
+                        <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                        
+                            <input type="file" class="profile-file-input" id="imageInput{{ member.id }}" name="image" accept="image/*" onchange="previewImage(`{{ member.id }}`)">
+                            <label for="imageInput{{ member.id}}" class="button profile-button-label">Upload image</label>
+                        
+                            <div id="imagePreview{{ member.id }}"></div>
+                        
+                            <input type="hidden" name="id" value="{{ member.id }}">
+                            <button type="submit" name="upload_avatar" id="saveImageButton{{ member.id }}" style="display: none;" class="button">Save image</button>
+                        </form>
+                        
+                        <br>
+
+                        {% if member.avatar %}
+                            <h3>Delete existing avatar</h3>
+                            <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ member.id }}">
+                                <button class="button" type="submit" name="delete_avatar">Delete avatar</button>
+                            </form>
+                        {% endif %}
+
+                        <br>
+
+                        <!-- Delete member -->
+                        <h3>Delete Team Member</h3>
+                        <form action="{% url 'profile' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ member.id }}">
+                            <button type="submit" name="delete_member" class="button">
+                                Delete {{ member.name }}
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </center>
+
+    <br>
+
+{% endblock %}

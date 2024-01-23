@@ -1,0 +1,419 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {% if page_view == 'create'%}
+        Create New Quiz
+    {% else %}
+        Edit Quiz Data
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    
+    <center>
+        {% if page_view == 'create'%}
+            <h1>Create a New Quiz</h1>
+        {% else %}
+            <h1>Edit your Quiz Data</h1>
+        {% endif %}
+    </center>
+
+    {% if page_view == 'create'%}
+
+        <form action="{% url 'create' %}" method="post" class="login-form">
+            {% csrf_token %}
+            <div class="group">
+                <label for="title" class="label">Title</label>
+                <input id="title" type="text" name="title" class="input" maxlength="200" placeholder="Please provide a title." 
+                oninput="countCharacters('title','charCountTitle')" required>
+            </div>
+            <p id="charCountTitle" class="counter" style="display: none;">Character count: 0/200</p>
+            <div class="group">
+                <label for="description" class="label">Description</label>
+                <textarea type="textfield" name="description" class="textarea" placeholder="Provide a description (optional)."></textarea>
+            </div>
+            <div class="group">
+                <label for="title" class="label">Quiz Category 1</label>
+                <select name="cat1" class="input">
+                    <option value="" selected></option>
+                    <option value="General Knowledge">General Knowledge</option>
+                    <option value="Science And Nature">Science And Nature</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Literature">Literature</option>
+                    <option value="Movies">Movies</option>
+                    <option value="Music">Music</option>
+                    <option value="Art And Culture">Art And Culture</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Food And Cooking">Food And Cooking</option>
+                    <option value="Animals">Animals</option>
+                    <option value="Mythology">Mythology</option>
+                    <option value="Language And Linguistics">Language And Linguistics</option>
+                    <option value="Famous People">Famous People</option>
+                    <option value="Current Events">Current Events</option>
+                    <option value="Politics">Politics</option>
+                    <option value="Health And Fitness">Health And Fitness</option>
+                    <option value="Travel And Tourism">Travel And Tourism</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Pop Culture">Pop Culture</option>
+                    <option value="Celebrities">Celebrities</option>
+                    <option value="TV Shows">TV Shows</option>
+                    <option value="Video Games">Video Games</option>
+                    <option value="Comics And Graphic Novels">Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests">Hobbies And Interests</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Religion And Spirituality">Religion And Spirituality</option>
+                    <option value="Architecture">Architecture</option>
+                </select>
+            </div>
+
+            <div class="group">
+                <label for="title" class="label">Quiz Category 2</label>
+                <select name="cat2" class="input">
+                    <option value="" selected></option>
+                    <option value="General Knowledge">General Knowledge</option>
+                    <option value="Science And Nature">Science And Nature</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Literature">Literature</option>
+                    <option value="Movies">Movies</option>
+                    <option value="Music">Music</option>
+                    <option value="Art And Culture">Art And Culture</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Food And Cooking">Food And Cooking</option>
+                    <option value="Animals">Animals</option>
+                    <option value="Mythology">Mythology</option>
+                    <option value="Language And Linguistics">Language And Linguistics</option>
+                    <option value="Famous People">Famous People</option>
+                    <option value="Current Events">Current Events</option>
+                    <option value="Politics">Politics</option>
+                    <option value="Health And Fitness">Health And Fitness</option>
+                    <option value="Travel And Tourism">Travel And Tourism</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Pop Culture">Pop Culture</option>
+                    <option value="Celebrities">Celebrities</option>
+                    <option value="TV Shows">TV Shows</option>
+                    <option value="Video Games">Video Games</option>
+                    <option value="Comics And Graphic Novels">Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests">Hobbies And Interests</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Religion And Spirituality">Religion And Spirituality</option>
+                    <option value="Architecture">Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label for="title" class="label">Quiz Category 3</label>
+                <select name="cat3" class="input">
+                    <option value="" selected></option>
+                    <option value="General Knowledge">General Knowledge</option>
+                    <option value="Science And Nature">Science And Nature</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Literature">Literature</option>
+                    <option value="Movies">Movies</option>
+                    <option value="Music">Music</option>
+                    <option value="Art And Culture">Art And Culture</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Food And Cooking">Food And Cooking</option>
+                    <option value="Animals">Animals</option>
+                    <option value="Mythology">Mythology</option>
+                    <option value="Language And Linguistics">Language And Linguistics</option>
+                    <option value="Famous People">Famous People</option>
+                    <option value="Current Events">Current Events</option>
+                    <option value="Politics">Politics</option>
+                    <option value="Health And Fitness">Health And Fitness</option>
+                    <option value="Travel And Tourism">Travel And Tourism</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Pop Culture">Pop Culture</option>
+                    <option value="Celebrities">Celebrities</option>
+                    <option value="TV Shows">TV Shows</option>
+                    <option value="Video Games">Video Games</option>
+                    <option value="Comics And Graphic Novels">Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests">Hobbies And Interests</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Religion And Spirituality">Religion And Spirituality</option>
+                    <option value="Architecture">Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label for="title" class="label">Quiz Category 4</label>
+                <select name="cat4" class="input">
+                    <option value="" selected></option>
+                    <option value="General Knowledge">General Knowledge</option>
+                    <option value="Science And Nature">Science And Nature</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Literature">Literature</option>
+                    <option value="Movies">Movies</option>
+                    <option value="Music">Music</option>
+                    <option value="Art And Culture">Art And Culture</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Food And Cooking">Food And Cooking</option>
+                    <option value="Animals">Animals</option>
+                    <option value="Mythology">Mythology</option>
+                    <option value="Language And Linguistics">Language And Linguistics</option>
+                    <option value="Famous People">Famous People</option>
+                    <option value="Current Events">Current Events</option>
+                    <option value="Politics">Politics</option>
+                    <option value="Health And Fitness">Health And Fitness</option>
+                    <option value="Travel And Tourism">Travel And Tourism</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Pop Culture">Pop Culture</option>
+                    <option value="Celebrities">Celebrities</option>
+                    <option value="TV Shows">TV Shows</option>
+                    <option value="Video Games">Video Games</option>
+                    <option value="Comics And Graphic Novels">Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests">Hobbies And Interests</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Religion And Spirituality">Religion And Spirituality</option>
+                    <option value="Architecture">Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                 <label style="display: flex; align-items: center; height: 30px">
+                    <input type="checkbox" name="private" class="checkbox"> &nbsp; Mark as private.
+                </label>
+            </div>
+                        <div class="subtext">
+                Marking as private will prevent other users from hosting this quiz. If you host this quiz, access to the quiz can be password protected.
+            </div>
+            <br>
+            <div class="group">
+                <input type="submit" class="button" name="create_quiz" value="Create">
+            </div>
+        </form>
+
+        <form action="{% url 'create' %}" method="post" class="login-form" enctype="multipart/form-data">
+            {% csrf_token %}
+    
+            <div class="group">
+                <input type="hidden" name="quiz_id" value="">
+                <input type="submit" class="button" name="cancel" value="Cancel">
+            </div>
+            
+        </form>
+        <br>
+
+    {% else %}
+        <form action="{% url 'create' %}" method="post" class="login-form">
+            {% csrf_token %}
+            <div class="group">
+                <label for="title" class="label">Title</label>
+                <input  id="title" type="text" name="title" class="input" maxlength="200" placeholder="Please provide a title." value="{{ quiz_data.title }}"
+                oninput="countCharacters('title','charCountTitle')" required>
+            </div>
+            <p id="charCountTitle" class="counter" style="display: none;">Character count: 0/200</p>
+            <div class="group">
+                <label for="description" class="label">Description</label>
+                <textarea type="textfield" name="description" class="textarea" placeholder="Provide a description (optional).">{{ quiz_data.description}}</textarea>
+            </div>
+            <div class="group">
+                <label for="title" class="label">Quiz Category 1</label>
+                <select name="cat1" class="input">
+                    <option value="" {%if not quiz_data.category1%}selected{% endif %}></option>
+                    <option value="General Knowledge" {%if quiz_data.category1 == 'General Knowledge' %}selected{% endif %}>General Knowledge</option>
+                    <option value="Science And Nature" {%if quiz_data.category1 == 'Science And Nature' %}selected{% endif %}>Science And Nature</option>
+                    <option value="History" {%if quiz_data.category1 == 'History' %}selected{% endif %}>History</option>
+                    <option value="Geography" {%if quiz_data.category1 == 'Geography' %}selected{% endif %}>Geography</option>
+                    <option value="Literature" {%if quiz_data.category1 == 'Literature' %}selected{% endif %}>Literature</option>
+                    <option value="Movies" {%if quiz_data.category1 == 'Movies' %}selected{% endif %}>Movies</option>
+                    <option value="Music" {%if quiz_data.category1 == 'Music' %}selected{% endif %}>Music</option>
+                    <option value="Art And Culture" {%if quiz_data.category1 == 'Art And Culture' %}selected{% endif %}>Art And Culture</option>
+                    <option value="Sports" {%if quiz_data.category1 == 'Sports' %}selected{% endif %}>Sports</option>
+                    <option value="Technology" {%if quiz_data.category1 == 'Technology' %}selected{% endif %}>Technology</option>
+                    <option value="Mathematics" {%if quiz_data.category1 == 'Mathematics' %}selected{% endif %}>Mathematics</option>
+                    <option value="Food And Cooking" {%if quiz_data.category1 == 'Food And Cooking' %}selected{% endif %}>Food And Cooking</option>
+                    <option value="Animals" {%if quiz_data.category1 == 'Animals' %}selected{% endif %}>Animals</option>
+                    <option value="Mythology" {%if quiz_data.category1 == 'Mythology' %}selected{% endif %}>Mythology</option>
+                    <option value="Language And Linguistics" {%if quiz_data.category1 == 'Language And Linguistics' %}selected{% endif %}>Language And Linguistics</option>
+                    <option value="Famous People" {%if quiz_data.category1 == 'Famous People' %}selected{% endif %}>Famous People</option>
+                    <option value="Current Events" {%if quiz_data.category1 == 'Current Events' %}selected{% endif %}>Current Events</option>
+                    <option value="Politics" {%if quiz_data.category1 == 'Politics' %}selected{% endif %}>Politics</option>
+                    <option value="Health And Fitness" {%if quiz_data.category1 == 'Health And Fitness' %}selected{% endif %}>Health And Fitness</option>
+                    <option value="Travel And Tourism" {%if quiz_data.category1 == 'Travel And Tourism' %}selected{% endif %}>Travel And Tourism</option>
+                    <option value="Fashion" {%if quiz_data.category1 == 'Fashion' %}selected{% endif %}>Fashion</option>
+                    <option value="Pop Culture" {%if quiz_data.category1 == 'Pop Culture' %}selected{% endif %}>Pop Culture</option>
+                    <option value="Celebrities" {%if quiz_data.category1 == 'Celebrities' %}selected{% endif %}>Celebrities</option>
+                    <option value="TV Shows" {%if quiz_data.category1 == 'TV Shows' %}selected{% endif %}>TV Shows</option>
+                    <option value="Video Games" {%if quiz_data.category1 == 'Video Games' %}selected{% endif %}>Video Games</option>
+                    <option value="Comics And Graphic Novels" {%if quiz_data.category1 == 'Comics And Graphic Novels' %}selected{% endif %}>Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests" {%if quiz_data.category1 == 'Hobbies And Interests' %}selected{% endif %}>Hobbies And Interests</option>
+                    <option value="Philosophy" {%if quiz_data.category1 == 'Philosophy' %}selected{% endif %}>Philosophy</option>
+                    <option value="Religion And Spirituality" {%if quiz_data.category1 == 'Religion And Spirituality' %}selected{% endif %}>Religion And Spirituality</option>
+                    <option value="Architecture" {%if quiz_data.category1 == 'Architecture' %}selected{% endif %}>Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label for="title" class="label">Quiz Category 2</label>
+                <select name="cat2" class="input">
+                    <option value="" {%if not quiz_data.category2%}selected{% endif %}></option>
+                    <option value="General Knowledge" {%if quiz_data.category2 == 'General Knowledge' %}selected{% endif %}>General Knowledge</option>
+                    <option value="Science And Nature" {%if quiz_data.category2 == 'Science And Nature' %}selected{% endif %}>Science And Nature</option>
+                    <option value="History" {%if quiz_data.category2 == 'History' %}selected{% endif %}>History</option>
+                    <option value="Geography" {%if quiz_data.category2 == 'Geography' %}selected{% endif %}>Geography</option>
+                    <option value="Literature" {%if quiz_data.category2 == 'Literature' %}selected{% endif %}>Literature</option>
+                    <option value="Movies" {%if quiz_data.category2 == 'Movies' %}selected{% endif %}>Movies</option>
+                    <option value="Music" {%if quiz_data.category2 == 'Music' %}selected{% endif %}>Music</option>
+                    <option value="Art And Culture" {%if quiz_data.category2 == 'Art And Culture' %}selected{% endif %}>Art And Culture</option>
+                    <option value="Sports" {%if quiz_data.category2 == 'Sports' %}selected{% endif %}>Sports</option>
+                    <option value="Technology" {%if quiz_data.category2 == 'Technology' %}selected{% endif %}>Technology</option>
+                    <option value="Mathematics" {%if quiz_data.category2 == 'Mathematics' %}selected{% endif %}>Mathematics</option>
+                    <option value="Food And Cooking" {%if quiz_data.category2 == 'Food And Cooking' %}selected{% endif %}>Food And Cooking</option>
+                    <option value="Animals" {%if quiz_data.category2 == 'Animals' %}selected{% endif %}>Animals</option>
+                    <option value="Mythology" {%if quiz_data.category2 == 'Mythology' %}selected{% endif %}>Mythology</option>
+                    <option value="Language And Linguistics" {%if quiz_data.category2 == 'Language And Linguistics' %}selected{% endif %}>Language And Linguistics</option>
+                    <option value="Famous People" {%if quiz_data.category2 == 'Famous People' %}selected{% endif %}>Famous People</option>
+                    <option value="Current Events" {%if quiz_data.category2 == 'Current Events' %}selected{% endif %}>Current Events</option>
+                    <option value="Politics" {%if quiz_data.category2 == 'Politics' %}selected{% endif %}>Politics</option>
+                    <option value="Health And Fitness" {%if quiz_data.category2 == 'Health And Fitness' %}selected{% endif %}>Health And Fitness</option>
+                    <option value="Travel And Tourism" {%if quiz_data.category2 == 'Travel And Tourism' %}selected{% endif %}>Travel And Tourism</option>
+                    <option value="Fashion" {%if quiz_data.category2 == 'Fashion' %}selected{% endif %}>Fashion</option>
+                    <option value="Pop Culture" {%if quiz_data.category2 == 'Pop Culture' %}selected{% endif %}>Pop Culture</option>
+                    <option value="Celebrities" {%if quiz_data.category2 == 'Celebrities' %}selected{% endif %}>Celebrities</option>
+                    <option value="TV Shows" {%if quiz_data.category2 == 'TV Shows' %}selected{% endif %}>TV Shows</option>
+                    <option value="Video Games" {%if quiz_data.category2 == 'Video Games' %}selected{% endif %}>Video Games</option>
+                    <option value="Comics And Graphic Novels" {%if quiz_data.category2 == 'Comics And Graphic Novels' %}selected{% endif %}>Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests" {%if quiz_data.category2 == 'Hobbies And Interests' %}selected{% endif %}>Hobbies And Interests</option>
+                    <option value="Philosophy" {%if quiz_data.category2 == 'Philosophy' %}selected{% endif %}>Philosophy</option>
+                    <option value="Religion And Spirituality" {%if quiz_data.category2 == 'Religion And Spirituality' %}selected{% endif %}>Religion And Spirituality</option>
+                    <option value="Architecture" {%if quiz_data.category2 == 'Architecture' %}selected{% endif %}>Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label for="title" class="label">Quiz Category 3</label>
+                <select name="cat3" class="input">
+                    <option value="" {%if not quiz_data.category3%}selected{% endif %}></option>
+                    <option value="General Knowledge" {%if quiz_data.category3 == 'General Knowledge' %}selected{% endif %}>General Knowledge</option>
+                    <option value="Science And Nature" {%if quiz_data.category3 == 'Science And Nature' %}selected{% endif %}>Science And Nature</option>
+                    <option value="History" {%if quiz_data.category3 == 'History' %}selected{% endif %}>History</option>
+                    <option value="Geography" {%if quiz_data.category3 == 'Geography' %}selected{% endif %}>Geography</option>
+                    <option value="Literature" {%if quiz_data.category3 == 'Literature' %}selected{% endif %}>Literature</option>
+                    <option value="Movies" {%if quiz_data.category3 == 'Movies' %}selected{% endif %}>Movies</option>
+                    <option value="Music" {%if quiz_data.category3 == 'Music' %}selected{% endif %}>Music</option>
+                    <option value="Art And Culture" {%if quiz_data.category3 == 'Art And Culture' %}selected{% endif %}>Art And Culture</option>
+                    <option value="Sports" {%if quiz_data.category3 == 'Sports' %}selected{% endif %}>Sports</option>
+                    <option value="Technology" {%if quiz_data.category3 == 'Technology' %}selected{% endif %}>Technology</option>
+                    <option value="Mathematics" {%if quiz_data.category3 == 'Mathematics' %}selected{% endif %}>Mathematics</option>
+                    <option value="Food And Cooking" {%if quiz_data.category3 == 'Food And Cooking' %}selected{% endif %}>Food And Cooking</option>
+                    <option value="Animals" {%if quiz_data.category3 == 'Animals' %}selected{% endif %}>Animals</option>
+                    <option value="Mythology" {%if quiz_data.category3 == 'Mythology' %}selected{% endif %}>Mythology</option>
+                    <option value="Language And Linguistics" {%if quiz_data.category3 == 'Language And Linguistics' %}selected{% endif %}>Language And Linguistics</option>
+                    <option value="Famous People" {%if quiz_data.category3 == 'Famous People' %}selected{% endif %}>Famous People</option>
+                    <option value="Current Events" {%if quiz_data.category3 == 'Current Events' %}selected{% endif %}>Current Events</option>
+                    <option value="Politics" {%if quiz_data.category3 == 'Politics' %}selected{% endif %}>Politics</option>
+                    <option value="Health And Fitness" {%if quiz_data.category3 == 'Health And Fitness' %}selected{% endif %}>Health And Fitness</option>
+                    <option value="Travel And Tourism" {%if quiz_data.category3 == 'Travel And Tourism' %}selected{% endif %}>Travel And Tourism</option>
+                    <option value="Fashion" {%if quiz_data.category3 == 'Fashion' %}selected{% endif %}>Fashion</option>
+                    <option value="Pop Culture" {%if quiz_data.category3 == 'Pop Culture' %}selected{% endif %}>Pop Culture</option>
+                    <option value="Celebrities" {%if quiz_data.category3 == 'Celebrities' %}selected{% endif %}>Celebrities</option>
+                    <option value="TV Shows" {%if quiz_data.category3 == 'TV Shows' %}selected{% endif %}>TV Shows</option>
+                    <option value="Video Games" {%if quiz_data.category3 == 'Video Games' %}selected{% endif %}>Video Games</option>
+                    <option value="Comics And Graphic Novels" {%if quiz_data.category3 == 'Comics And Graphic Novels' %}selected{% endif %}>Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests" {%if quiz_data.category3 == 'Hobbies And Interests' %}selected{% endif %}>Hobbies And Interests</option>
+                    <option value="Philosophy" {%if quiz_data.category3 == 'Philosophy' %}selected{% endif %}>Philosophy</option>
+                    <option value="Religion And Spirituality" {%if quiz_data.category3 == 'Religion And Spirituality' %}selected{% endif %}>Religion And Spirituality</option>
+                    <option value="Architecture" {%if quiz_data.category3 == 'Architecture' %}selected{% endif %}>Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label for="title" class="label">Quiz Category 4</label>
+                <select name="cat4" class="input">
+                    <option value="" {%if not quiz_data.category4%}selected{% endif %}></option>
+                    <option value="General Knowledge" {%if quiz_data.category4 == 'General Knowledge' %}selected{% endif %}>General Knowledge</option>
+                    <option value="Science And Nature" {%if quiz_data.category4 == 'Science And Nature' %}selected{% endif %}>Science And Nature</option>
+                    <option value="History" {%if quiz_data.category4 == 'History' %}selected{% endif %}>History</option>
+                    <option value="Geography" {%if quiz_data.category4 == 'Geography' %}selected{% endif %}>Geography</option>
+                    <option value="Literature" {%if quiz_data.category4 == 'Literature' %}selected{% endif %}>Literature</option>
+                    <option value="Movies" {%if quiz_data.category4 == 'Movies' %}selected{% endif %}>Movies</option>
+                    <option value="Music" {%if quiz_data.category4 == 'Music' %}selected{% endif %}>Music</option>
+                    <option value="Art And Culture" {%if quiz_data.category4 == 'Art And Culture' %}selected{% endif %}>Art And Culture</option>
+                    <option value="Sports" {%if quiz_data.category4 == 'Sports' %}selected{% endif %}>Sports</option>
+                    <option value="Technology" {%if quiz_data.category4 == 'Technology' %}selected{% endif %}>Technology</option>
+                    <option value="Mathematics" {%if quiz_data.category4 == 'Mathematics' %}selected{% endif %}>Mathematics</option>
+                    <option value="Food And Cooking" {%if quiz_data.category4 == 'Food And Cooking' %}selected{% endif %}>Food And Cooking</option>
+                    <option value="Animals" {%if quiz_data.category4 == 'Animals' %}selected{% endif %}>Animals</option>
+                    <option value="Mythology" {%if quiz_data.category4 == 'Mythology' %}selected{% endif %}>Mythology</option>
+                    <option value="Language And Linguistics" {%if quiz_data.category4 == 'Language And Linguistics' %}selected{% endif %}>Language And Linguistics</option>
+                    <option value="Famous People" {%if quiz_data.category4 == 'Famous People' %}selected{% endif %}>Famous People</option>
+                    <option value="Current Events" {%if quiz_data.category4 == 'Current Events' %}selected{% endif %}>Current Events</option>
+                    <option value="Politics" {%if quiz_data.category4 == 'Politics' %}selected{% endif %}>Politics</option>
+                    <option value="Health And Fitness" {%if quiz_data.category4 == 'Health And Fitness' %}selected{% endif %}>Health And Fitness</option>
+                    <option value="Travel And Tourism" {%if quiz_data.category4 == 'Travel And Tourism' %}selected{% endif %}>Travel And Tourism</option>
+                    <option value="Fashion" {%if quiz_data.category4 == 'Fashion' %}selected{% endif %}>Fashion</option>
+                    <option value="Pop Culture" {%if quiz_data.category4 == 'Pop Culture' %}selected{% endif %}>Pop Culture</option>
+                    <option value="Celebrities" {%if quiz_data.category4 == 'Celebrities' %}selected{% endif %}>Celebrities</option>
+                    <option value="TV Shows" {%if quiz_data.category4 == 'TV Shows' %}selected{% endif %}>TV Shows</option>
+                    <option value="Video Games" {%if quiz_data.category4 == 'Video Games' %}selected{% endif %}>Video Games</option>
+                    <option value="Comics And Graphic Novels" {%if quiz_data.category4 == 'Comics And Graphic Novels' %}selected{% endif %}>Comics And Graphic Novels</option>
+                    <option value="Hobbies And Interests" {%if quiz_data.category4 == 'Hobbies And Interests' %}selected{% endif %}>Hobbies And Interests</option>
+                    <option value="Philosophy" {%if quiz_data.category4 == 'Philosophy' %}selected{% endif %}>Philosophy</option>
+                    <option value="Religion And Spirituality" {%if quiz_data.category4 == 'Religion And Spirituality' %}selected{% endif %}>Religion And Spirituality</option>
+                    <option value="Architecture" {%if quiz_data.category4 == 'Architecture' %}selected{% endif %}>Architecture</option>
+                </select>
+            </div>
+            
+            <div class="group">
+                <label style="display: flex; align-items: center; height: 30px">
+                    {% if quiz_data.private == True %}
+                        <input type="checkbox" name="private" class="checkbox" checked> &nbsp; Mark as private.
+                    {% else %}
+                        <input type="checkbox" name="private" class="checkbox"> &nbsp; Mark as private.
+                    {% endif %}
+                </label>
+            </div>
+            <div class="subtext">
+                Marking as private will prevent other users from hosting this quiz. If you host this quiz, access to the quiz can be password protected.
+            </div>
+                  
+            <br>
+            <div class="group">
+                <input type="hidden" name="id" value="{{ quiz_data.id }}">
+                <input type="submit" class="button" name="edit_quiz" value="Save changes">
+            </div>
+        </form>
+
+        <form action="{% url 'create' %}" method="post" class="login-form" enctype="multipart/form-data">
+            {% csrf_token %}
+    
+            <div class="group">
+                <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                <input type="submit" class="button" name="cancel" value="Cancel">
+            </div>
+            
+        </form>
+
+        <br><br>
+
+        {% if not quiz_data.edit_only %}
+        <center>
+            <h1>Delete This Quiz</h1>
+        </center>
+        <p><strong>Warning: This action is irreversible</strong></p>
+        <form action="{% url 'create' %}" method="post" class="login-form">
+            {% csrf_token %}
+            <div class="group">
+                <input type="hidden" name="id" value="{{ quiz_data.id }}">
+                <input type="submit" class="button" name="delete_quiz" value="Delete Quiz" onclick="confirmDelete(event, 'del_quiz_inst')">
+            </div>
+        </form>
+        {% endif %}
+
+        <br>
+
+    {% endif %}
+
+{% endblock %}

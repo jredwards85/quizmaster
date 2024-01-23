@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"> 
+    <link href="{% static 'styles.css' %}" rel="stylesheet"> 
+    <title>
+        {% block title%}{% endblock %}
+    </title>
+</head>
+<body>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div id="fadeDiv" class="fade-out">
+            {% for message in messages %}
+                {% if message.tags %}
+                    <div class="{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                    <br/>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="main-layout-container">
+
+        <!-- TODO: The top bar should show the current quiz name while playing the actual quiz -->
+        <div id="main-layout-top-pc" class="main-layout-top">
+            {% if showcase_status %} 
+            <a class="spaced-text1" href="{% url 'join_quiz' showcase_data.quiz_instance.id %}">
+                <p class="fade-in-element">CLICK HERE TO JOIN THE CHRISTMAS QUIZ</p>
+            </a>
+            {% endif %}
+        </div>
+
+        <div id="main-layout-top-mob" class="main-layout-top">
+            {% if showcase_status %} 
+            <a class="spaced-text2" href="{% url 'join_quiz' showcase_data.quiz_instance.id %}">
+                <p class="fade-in-element">JOIN THE CHRISTMAS QUIZ</p>
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="main-layout-top-logo">
+            
+            <div class="title-block">
+                <p>
+                    <a href="{% url 'index' %}">
+                        THE QUIZ BOUTIQUE
+                    </a>
+                </p>   
+            </div>
+            
+            <div id="menu-icon-mob" class="menu-icon-mob">
+                <svg width="35" height="35" fill="#333" class="pointer" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+                </svg>
+            </div>
+
+        </div> 
+
+        <div id="menu-bar-pc" class="main-layout-top-menu">
+            
+
+            <div class="main-layout-top-menu-center">
+                <a href="{% url 'logged_in_index' %}">HOME</a>
+                <a href="{% url 'my_quizzes' %}">MY QUIZZES</a>
+                <a href="{% url 'create' %}">CREATE A QUIZ</a>
+                <a href="{% url 'browse' %}">BROWSE QUIZZES</a>
+            </div>
+
+            <div class="main-layout-top-menu-right">
+                <svg id="main-layout-top-menu-right-svg" width="30" height="30" fill="#333" class="pointer" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                </svg>
+
+                <div id="main-layout-top-menu-right-dropdown" class="main-layout-top-menu-right-dropdown">
+                    <div class="dropdown-menu-item-container">
+                        <div class="dropdown-menu-item-svg">
+                            <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" onmouseover="this.style.fill='#333'">
+                                <path d="M6.5 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                <path d="M4.5 0A2.5 2.5 0 0 0 2 2.5V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2.5A2.5 2.5 0 0 0 11.5 0zM3 2.5A1.5 1.5 0 0 1 4.5 1h7A1.5 1.5 0 0 1 13 2.5v10.795a4.2 4.2 0 0 0-.776-.492C11.392 12.387 10.063 12 8 12s-3.392.387-4.224.803a4.2 4.2 0 0 0-.776.492z"/>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu-item-url">
+                            <a href="{% url 'profile' %}">My profile</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu-item-container">
+                        <div class="dropdown-menu-item-svg">
+                            <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" onmouseover="this.style.fill='#333'">
+                                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu-item-url">
+                            <a href="{% url 'account' %}">Account</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-menu-item-container">
+                        <div class="dropdown-menu-item-svg">
+                            <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" onmouseover="this.style.fill='#333'">
+                                <path d="M3 2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v13h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3zm1 13h8V2H4z"/>
+                                <path d="M9 9a1 1 0 1 0 2 0 1 1 0 0 0-2 0"/>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu-item-url">
+                            <a href="{% url 'logout' %}">Log out</a>
+                        </div>
+                    </div>
+                         
+                </div>
+            </div>
+        </div>
+
+            {% if request.resolver_match.url_name != 'logged_in_index' %}
+                <div class="main-layout-middle-slim">
+                    <div class="main-layout-middle-contents">
+            {% else %}
+                <div class="main-layout-middle">
+                    <div>
+            {% endif%}
+                    {% block body %}{% endblock %}
+                </div>   
+            </div>
+        
+        
+        <div class="main-layout-footer">
+            <p>Copyright &copy; The Quiz Boutique</p>
+        </div>
+
+    </div>
+
+    <!-- Mobile menu overlay-->
+    <div id="main-mobile-menu" class="main-mobile-menu">
+        <div class="main-mobile-menu-contents">
+            <div id="main-mobile-menu-x" class="main-mobile-menu-x">
+                <svg width="30" height="30" fill="#333" class="pointer" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                </svg>
+            </div>
+            
+            <div>
+                <a href="{% url 'index' %}">HOME</a>
+            </div>
+            <div>
+                <a href="{% url 'profile' %}">PROFILE</a>
+            </div>
+            <div>
+                <a href="{% url 'my_quizzes' %}">MY QUIZZES</a>
+            </div>
+            <div>
+                <a href="{% url 'create' %}">CREATE A QUIZ</a>
+            </div>
+            <div>
+                <a href="{% url 'browse' %}">BROWSE QUIZZES</a>
+            </div>
+            <div>
+                <a href="{% url 'account' %}">ACCOUNT</a>
+            </div>
+            <div>
+                <a href="{% url 'logout' %}">LOG OUT</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Required to execute the JavaScript-->
+    <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
+
+</body>
+</html>
+
+<!-- 
+
+https://www.wix.com/website-template/view/html/2143?originUrl=https%3A%2F%2Fwww.wix.com%2Fwebsite%2Ftemplates%2Fhtml%2Fonline-store&tpClick=view_button&esi=401c4ded-127d-40d0-9539-25111d8b886c
+
+-->

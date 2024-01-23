@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <link href="{% static 'styles_themes.css' %}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <title>The Quiz Boutique</title>
+</head>
+<body>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div id="fadeDiv" class="fade-out">
+        {% for message in messages %}
+            {% if message.tags %}
+                <div class="{{ message.tags }}">
+                    {{ message }}
+                </div>
+                <br/>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+ 
+    <div class="login-container">
+        <div class="login-wrap">
+            <div class="login-html">
+                <center>
+                <p class="welcome">Welcome to Quiz Boutique</p></center>
+                <input id="tab-1" type="radio" name="tab" class="tab-1" checked>
+                <label for="tab-1" class="radio-label">Sign In</label>
+            
+                <input id="tab-2" type="radio" name="tab" class="tab-2">
+                <label for="tab-2" class="radio-label">Sign Up</label>
+        
+                <div class="login-form">
+
+                    <div class="hidden-div hidden-div-1">
+                        <form action="{% url 'logged_out_index' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            <div class="group">
+                                <label for="username" class="label">Username</label>
+                                <input type="text" id="noSpacesInput1" name="username" class="input" maxlength="50" required>
+                            </div>
+                            <div class="group">
+                                <label for="password" class="label">Password</label>
+                                <input type="password" name="password" class="input" maxlength="50" required>
+                            </div>
+                            <div class="group">
+                                <input type="submit" class="button" name="login" value="Sign In">
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="hidden-div hidden-div-2">
+                        <form action="{% url 'logged_out_index' %}" method="post" class="login-form">
+                            {% csrf_token %}
+                            <div class="group">
+                                <label for="username" class="label">Username</label>
+                                <input type="text" id="noSpacesInput2" name="username" class="input" maxlength="50" required>
+                            </div>
+                            <div class="group">
+                                <label for="password" class="label">Password</label>
+                                <input type="password" name="password" class="input" maxlength="50" required>
+                            </div>
+                            <div class="group">
+                                <label for="password_confirm" class="label">Repeat Password</label>
+                                <input type="password" name="password_confirm" class="input" maxlength="50" required>
+                            </div>
+                            <div class="group">
+                                <input type="submit" class="button" name="register" value="Sign Up">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function handleNoSpacesInput(event) {
+          // Remove leading and trailing spaces
+          const inputValue = event.target.value.trim();
+      
+          // Remove any spaces from the input value
+          const sanitizedValue = inputValue.replace(/\s/g, '');
+      
+          // Update the input value without spaces
+          event.target.value = sanitizedValue;
+        }
+      
+        document.getElementById('noSpacesInput1').addEventListener('input', handleNoSpacesInput);
+        document.getElementById('noSpacesInput2').addEventListener('input', handleNoSpacesInput);
+      </script>
+
+
+    <!-- Required to execute the JavaScript-->
+    <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
+
+</body>
+</html>
+    
+
+
+
+
+

@@ -1,0 +1,625 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quiz Hosting
+{% endblock %}
+
+{% block body %}
+
+    <!-- STATUS TOP ROW -->
+    <center><h3>{{ quiz_data.quiz.title }}</h3></center>
+    <hr style="border-color: #000; margin-top: -10px;">
+        
+    
+    {% if quiz_data.quiz_step == 0 %}
+        <div id="host-quiz-status-bar" class="host-status myquiz-status-orange" style="height: 25px;">
+            NOT YET STARTED
+        </div>    
+    {% elif quiz_data.quiz_step == 1 %}
+        <div id="host-quiz-status-bar" class="host-status myquiz-status-blue" style="height: 25px;">
+            IN PROGRESS
+        </div>
+    {% else %}
+        <div id="host-quiz-status-bar" class="host-status myquiz-status-green" style="height: 25px;">
+            COMPLETE
+        </div>  
+    {% endif %}
+
+    <div style="display: flex; flex-direction: row;  justify-content: space-around; margin-bottom: 10px;">
+    
+        <div style="display: flex; flex-direction: column; flex: 1;">
+
+            <div style="text-align: center; margin-bottom: 5px; font-size: 0.8em;">
+                <strong>HOSTED</strong>
+            </div>
+
+            <div style="text-align: center;">
+                {{ quiz_data.hosted_at|date:"d/m/Y" }}<br> 
+                {{ quiz_data.hosted_at|date:"g:i a" }}
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; flex: 1;">
+
+            <div style="text-align: center; margin-bottom: 5px; font-size: 0.8em;">
+                <strong>COMPLETED</strong>
+            </div>
+
+            <div id="host-completed-time-stamp" style="text-align: center;">
+                {{ quiz_data.completed_on|date:"d/m/Y" }}<br> 
+                {{ quiz_data.completed_on|date:"g:i a" }}
+            </div>
+        </div>
+    
+    </div>
+        
+    <br>
+
+    {% if quiz_data.quiz_step != 2%}
+        <!-- PARTICIPANT INFORMATION -->
+        <center><h3>Participants</h3></center>
+        <hr style="border-color: #000; margin-top: -10px;">
+            
+        <div style="display: flex; flex-direction: column; ">
+            
+            {% for participant in participants %}
+                
+                <div class="host-participant-card">
+                    
+                    <div style="display: flex; flex-direction: row; margin-bottom: 10px;">
+                        <div>
+                            {% if participant.id in online_participant_ids %}
+                                <svg id="host-online-status-svg-{{ participant.id }}" width="20" height="20" fill="#6bdb9a"  viewBox="0 0 16 16">
+                            {% else %}
+                                <svg id="host-online-status-svg-{{ participant.id }}" width="20" height="20" fill="gray"  viewBox="0 0 16 16">
+                            {% endif %}
+                                    <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472M3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm2.802-3.5a6.959 6.959 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.024 7.024 0 0 0-3.072-2.472c.218.284.418.598.597.933zM10.855 4a7.966 7.966 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z"/>
+                                </svg>
+                        </div>
+                        <div style="display: flex; flex: 1; margin-left: 10px; align-items: center;">
+                            {% if participant.user.team_names.all %}
+                                {% for team_name in participant.user.team_names.all %}
+                                    {% if team_name.name|length > 0 %}
+                                        {{ team_name.name }}
+                                    {% else %}
+                                        {{ participant.user.username }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {{ participant.user.username }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: row;">
+                        <div>
+                            <svg width="20" height="20" fill="#333" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                            </svg>
+                        </div>
+
+                        <div style="display: flex; flex: 1; margin-left: 10px; align-items: center;">
+                            {% for team_member in participant.user.team_members.all %}
+                                {{ team_member.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+
+                    </div> 
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+
+    {% if quiz_data.quiz_step == 0 %}
+
+        <br>
+
+        <!-- QUIZ PARAMETERS - BEFORE STARTING -->
+        <center><h3>Quiz Parameters</h3></center>
+        <hr style="border-color: #000; margin-top: -10px;">
+
+        <br>
+        <h3>Passwords</h3>
+        <p>The below password is required to join this quiz:</p>  
+
+        
+        <form action="{% url 'quiz_host' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="quiz_id" value="{{ quiz_data.id}}">                
+            <input type="text" class="input" name="password" maxlength="50" value="{{ quiz_data.password }}" placeholder="Enter a password to restrict access..." required>
+            {% if quiz_data.password %}                
+                <button type="submit" class="button" name="change_password">Change Password</button>
+            {% else %}
+                <button type="submit" class="button" name="change_password">Add Password</button>
+            {% endif %}
+        </form>            
+
+        <br>
+
+        {% if quiz_data.password %}
+        <p>Remove password to allow anyone to join this quiz:</p>
+        <form action="{% url 'quiz_host' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="quiz_id" value="{{ quiz_data.id}}">
+            <button type="submit" class="button" name="remove_password">Remove Password</button>
+        </form>
+
+        <br><br>
+        {% endif %}
+
+        {% if quiz_data.play_type == 0 %}
+
+            <h3>Local / Remote Mode</h3>
+            <p>
+                Selection between local (questions shown on one screen, but not on devices) or remote mode (questions shown on individuals devices). In local mode, the host must register as a participant, and share their view.
+            </p>
+
+            <div class="question-multiple-choice">
+                <form>                
+                    <input id="local-false" type="radio" name="selectlocal" value="True" onchange="changeQuizParameter(this, 'mode')" {% if quiz_data.local_mode %}checked{% endif %}>
+                    <label for="local-false">Local Mode</label>
+                    
+                    <input id="local-true" type="radio" name="selectlocal" value="False" onchange="changeQuizParameter(this, 'mode')" {% if not quiz_data.local_mode %}checked{% endif %}>
+                    <label for="local-true">Remote Mode</label>                     
+                </form>
+            </div>
+            <br><br>
+
+        {% endif %}
+
+        {% if quiz_data.play_type == 0 %}
+
+            <h3>Answer Options</h3>
+            <p>
+                Selection between open answers and multiple choice, or multiple choice only:
+            </p>
+
+            <div class="question-multiple-choice">
+                <form>                
+                    <input id="select-false" type="radio" name="select" value="False" onchange="changeQuizParameter(this, 'multi')" {% if not quiz_data.multichoice_only%}checked{% endif %}>
+                    <label for="select-false">With Open Answers</label>
+                    
+                    <input id="select-true" type="radio" name="select" value="True" onchange="changeQuizParameter(this, 'multi')" {% if quiz_data.multichoice_only%}checked{% endif %}>
+                    <label for="select-true">Multiple Choice Answers Only</label> 
+                </form>
+            </div>
+            <br><br>
+
+        {% endif %}
+        
+        {% if quiz_data.local_mode and is_participant or not quiz_data.local_mode %}
+        
+            <div id="start-quiz-block" style="display: block;">
+
+        {% else %}
+
+            <div id="start-quiz-block" style="display: none;">
+
+        {% endif %}
+        
+            <h3>Start Quiz</h3>
+            <p>Once the quiz is started, joining is no longer possible!</p>
+            <form action="{% url 'quiz_host' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="quiz_id" value="{{ quiz_data.id}}">
+                <button type="submit" class="button" name="start_quiz">Start Quiz</button>
+            </form>
+        </div>
+
+        {% if quiz_data.local_mode and is_participant or not quiz_data.local_mode %}
+
+            <div id="local-warning-block" style="display: none">
+
+        {% else %}
+
+        <div id="local-warning-block" style="display: block">
+
+        {% endif%}
+
+            <div class="url">
+                
+            <p style="color: red;">
+                <strong>
+                    CANNOT START QUIZ IN LOCAL MODE WITHOUT THE HOST REGISTERED AS A PARTICIPANT! CLICK 
+                    <a href="{% url 'join_quiz' quiz_data.id %}" onclick="updateWarningMessage(event)">HERE TO JOIN QUIZ.</a>
+                </strong>
+            </p>
+            </div>
+        </div>
+        
+
+        <script>
+
+            let local_warning;
+
+            window.onload = function() {
+                local_warning = "{{ is_participant }}"
+            }
+
+            function changeQuizParameter(radioButton, parameter) {
+                
+                let local_warning_current = window.getComputedStyle(document.getElementById('local-warning-block')).display;
+
+                let quiz_id = "{{ quiz_data.id }}"
+                let radio_value = radioButton.value;
+
+                let data = {
+                    quiz_id,
+                    parameter,
+                    radio_value,
+                }
+
+                fetch('/change_quiz_parameter', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+
+                if (parameter === "mode" &&  local_warning === "False") {
+
+                    if (radio_value === "False" && local_warning_current === 'block') {
+                        
+                        document.getElementById("local-warning-block").style.display = "none";
+                        document.getElementById("start-quiz-block").style.display = "block";
+
+                    } else if (radio_value === "True" && local_warning_current === 'none') {
+
+                        document.getElementById("local-warning-block").style.display = "block";
+                        document.getElementById("start-quiz-block").style.display = "none";
+
+                    }
+
+                }
+            }
+
+            function updateWarningMessage(event) {
+                
+                event.preventDefault();
+
+                window.open(event.target.href, '_blank');
+                
+                local_warning = "True"
+
+                document.getElementById("local-warning-block").style.display = "none";
+                document.getElementById("start-quiz-block").style.display = "block";
+            }
+        </script>
+
+    {% elif quiz_data.quiz_step == 1 %}
+
+        {% if quiz_data.play_type == 0 %}
+
+            <br><br>
+            <!-- QUIZ PROGRESS - WHILE IN PROGRESS -->
+            <center><h3>Quiz Progress</h3></center>
+            <hr style="border-color: #000; margin-top: -10px;">
+
+            <h3>Current Question</h3>
+
+            <table>
+                <tr>
+                    <th style="text-align: left;">Question</th>
+                    <td>{{ question_data.question_number}}</td>
+                </tr>
+
+                <tr>
+                    <th style="text-align: left;">Type</th>
+                    <td>{% if question_data.question_type == 1 %}Text based only{% elif question_data.question_type == 2 %}With image{% else %}With audio{% endif %}</td>
+                </tr>
+                
+                {% if question_data.question_type == 2 %}
+                    <tr>
+                        <th style="text-align: left;">Image Link</th>
+                        <td>
+                            <a href="{{ question_data.image.url}}" target="_blank">Click to open image</a>
+                        </td>
+                    </tr>
+                {% elif question_data.question_type == 3 %}
+                    <tr>
+                        <th style="text-align: left;">Audio File</th>
+                        <td>
+                            <audio controls>
+                                <source src="{{ question_data.audio.url }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                <tr>
+                    <th style="text-align: left;"><u>Question text</u></th>
+                </tr>
+                <tr>
+                    <td>{{ question_data.question_text }}</td>
+                </tr>
+
+                <tr>
+                    <th style="text-align: left;">Answer 1</th>
+                    <td>{{ question_data.answer1 }}</td>
+                </tr>
+
+                <tr>
+                    <th style="text-align: left;">Answer 2</th>
+                    <td>{{ question_data.answer2 }}</td>
+                </tr>
+
+                <tr>
+                    <th style="text-align: left;">Answer 3</th>
+                    <td>{{ question_data.answer3 }}</td>
+                </tr>
+
+                <tr>
+                    <th style="text-align: left;">Answer 4</th>
+                    <td>{{ question_data.answer4 }}</td>
+                </tr>
+            </table>
+
+            <br>
+            <h3>Participant Status</h3>
+
+            <div>
+
+                
+                {% for answer in answers %}
+                    
+                    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+
+                        <div style="display: flex; flex-direction: row;">
+                        
+                            <div id="host-team-answer-status-indicator-{{ answer.participant.id }}" style="margin-right: 10px;">
+                                {% if answer.question_step == 4 and answer.verification == False %}
+                                    <svg width="25" height="25" fill="green" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>                              
+                                    </svg>
+                                {% else %}
+                                    <svg width="25" height="25" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                                    </svg>
+                                {% endif %}
+                            </div>
+
+                            <div style="display: flex; align-items: center;">
+                                {% if answer.participant.user.team_names.all %}
+                                {% for team_name in answer.participant.user.team_names.all %}
+                                    {% if team_name.name|length > 0%}                                    
+                                        {{ team_name.name }}
+                                    {% else %}
+                                        {{ answer.participant.user.username }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {{ answer.participant.user.username }}
+                            {% endif %}
+                            </div>
+
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; margin-top: 10px;">
+                            
+                            <div id="host-team-answer-status-detailed-{{ answer.participant.id }}">
+                                
+                                {% if answer.question_step == 0 or answer.question_step == 1 %}
+                                    At: Open question
+                                {% elif answer.question_step == 2 %}
+                                    At: Multiple choice
+                                {% elif answer.question_step == 4 and answer.verification == False %}
+                                    Answer submitted
+                                {% elif answer.question_step == 4 and answer.verification == True %}
+                                    Answer requires verification:
+                                {% endif %}
+                                
+                            </div>
+
+                            {% if answer.question_step == 4 and answer.verification == True %}
+                                <div id="host-verify-div-{{ answer.participant.id }}" style="display: block">
+                            {% else %}
+                                <div id="host-verify-div-{{ answer.participant.id }}" style="display: none">
+                            {% endif %}
+                                    <br>
+                                    <table>
+                                        <tr>
+                                            <th style="text-align: left;">Answer given:</th>
+                                            <td id="host-team-answer-verification-value-{{ answer.participant.id }}">{{ answer.given_answer }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align: left;">Correct answer:</th>
+                                            <td>{{ correct_answer }}</td>
+                                        </tr>
+                                    </table>
+                                    
+                                    <br>
+                                    <div class="question-multiple-choice">
+                                        <form action="{% url 'quiz_host' quiz_data.id %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                                            <input type="hidden" name="answer_id" value="{{ answer.id }}">
+                                            
+                                            <input type="radio" name="status" value="True" id="correct{{ answer.id }}" required>
+                                            <label for="correct{{ answer.id }}">Correct</label>
+                                            
+                                            <input type="radio" name="status" value="False" id="incorrect{{ answer.id }}" required>
+                                            <label for="incorrect{{ answer.id }}">Incorrect</label>
+                                            
+                                            <button type="submit" class="button" name="verify_answer">Verify Answer</button>
+                                        </form>
+                                    </div>
+                                </div>
+                        </div>
+                    
+                    </div>
+                {% endfor %}
+            </div>
+
+            <br>
+
+            <div style="display: flex; flex-direction: row;  justify-content: center;">
+                <div id="host-next-step-indicator" style="margin-right: 10px;">
+                    {% if not next_step %}
+                        <svg width="25" height="25" fill="orange" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                        </svg>
+                    {% else %}
+                        <svg width="25" height="25" fill="green" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>                              
+                        </svg>
+                    {% endif %}
+                </div>
+                <div id="host-next-step-indicator-text" style="display: flex; align-items: center; font-weight: bold; font-size: 0.8em;">
+                    {% if not next_step %}
+                        NOT ALL PARTICIPANTS HAVE ANSWERED
+                    {% else %}
+                        ALL PARTICIPANTS HAVE ANSWERED
+                    {% endif %}
+                </div>
+            </div>
+
+            <br>
+
+            <div>
+                <form action="{% url 'quiz_host' quiz_data.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+                    <button type="submit" class="button" name="next_step">Start next question / Force next question</button>
+                </form>
+            </div>
+
+
+        {% elif quiz_data.play_type ==  1 %}
+
+            <a href="{% url 'join_quiz' quiz_data.id %}">Join the quiz</a>
+
+            <p> ADD A FORCE QUESTION BUTTON</p>
+            <P> SHOW CURRENT PARTICIPANT STEPS?</P>
+
+        {% endif %}
+
+
+        <script>
+
+            function updateHostView() {
+                
+                let quiz_id = "{{ quiz_data.id }}"
+
+                fetch('/update_host_view', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({quiz_id}),
+                })
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.next_step === true ) {
+                        document.getElementById('host-next-step-indicator').innerHTML = `
+                            <svg width="25" height="25" fill="green" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>                              
+                            </svg>`;
+                        
+                            document.getElementById('host-next-step-indicator-text').innerText = `ALL PARTICIPANTS HAVE ANSWERED`  
+                        
+                    }
+
+                    for (let i = 0; i < data.online_status.length; i++) {
+                        let participantId = data.online_status[i][0];
+                        let isActive = data.online_status[i][1];
+                    
+                        let userIndicator = document.getElementById(`host-online-status-svg-${participantId}`);
+                    
+                        if (isActive) {
+                            userIndicator.style.fill = '#6bdb9a';
+                        } else {
+                            userIndicator.style.fill = 'grey';
+                        }
+                    }
+
+                    for (let i = 0; i < data.answer_steps.length; i++) {
+                        let participantId = data.answer_steps[i][0];
+                        let textReplace = data.answer_steps[i][1];
+                        let verification = data.answer_steps[i][2];
+
+                        document.getElementById(`host-team-answer-status-detailed-${participantId}`).innerText = textReplace;
+
+                        if (verification === true ) {
+                            
+                            document.getElementById(`host-team-answer-status-indicator-${participantId}`).innerHTML = `
+                                <svg width="25" height="25" fill="green" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                    <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/>                              
+                                </svg>
+                            `;
+
+                        }
+
+
+                        if (data.answer_steps[i][3]) {
+                            let givenAnswer = data.answer_steps[i][3];
+
+                            document.getElementById(`host-verify-div-${participantId}`).style.display = 'block';
+                            document.getElementById(`host-team-answer-verification-value-${participantId}`).innerText = givenAnswer;
+
+                        }
+                    }
+                });
+            }
+
+            setInterval(updateHostView, 2000);
+
+        </script>
+
+
+    {% endif %}
+
+    <!-- QUIZ RESULTS -->
+    {% if quiz_data.quiz_step == 2 %}
+        
+        <center><h3>Quiz Results</h3></center>
+        <hr style="border-color: #000; margin-top: -10px;">
+
+        <div style="display: flex; flex-direction: column;">
+            
+            {% for participant, data, rank in sorted_participant_points.values %}
+                                    
+                <div style="display: flex; flex-direction: column; padding: 10px; border-radius: 5px; margin-bottom: 10px;" 
+                class="{% if rank == 1 %}results-teams-item-gold{% elif rank == 2 %}results-teams-item-silver
+                {% elif rank == 3 %}results-teams-item-bronze{% else %}results-teams-item-runnerup{% endif %}">
+
+                    <div style="display: flex; flex-direction: row;">
+
+                        <div style="width: 30px">
+                            {{ rank }}
+                        </div>
+                        <div style="flex: 1">                                        
+                            {% for quiz_team in participant.quizteam_set.all %}
+                                {{ quiz_team.team_name }}
+                                <br>
+                                <p>Members:
+                                    {% for quiz_member in quiz_team.quizmember_set.all %}
+                                        {{ quiz_member.member_name }}{% if not forloop.last %}, {% endif%}
+                                    {% endfor %}
+                                </p>
+                            {% endfor %}
+                            <strong>Scored: {{ data }}</strong>
+                            <br>
+                            <div class="url" >
+                                <a href="{% url 'results' quiz_data.id participant.user.id %}"">See team results in detail</a>
+                            </div>
+                                                                
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>            
+    {% endif %}
+                               
+    <br>
+
+{% endblock %}

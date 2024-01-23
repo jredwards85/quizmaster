@@ -1,0 +1,331 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <title>Setup your profile</title>
+</head>
+<body>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div id="fadeDiv" class="fade-out">
+        {% for message in messages %}
+            {% if message.tags %}
+                <div class="{{ message.tags }}">
+                    {{ message }}
+                </div>
+                <br/>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="main-layout-container">
+
+        <div class="main-layout-top-logo">
+            
+            <div class="title-block">
+                <p>
+                    THE QUIZ BOUTIQUE
+                </p>   
+            </div>
+
+        </div> 
+
+        
+        <div class="main-layout-middle-slim">
+            <div class="main-layout-middle-contents">
+    
+                <center>
+                    <h2>Hi there! Getting started is easy...</h2>
+                </center>
+                <br><br>
+    
+                {% if request.user.profile == 0 %}        
+                    <div class="setup-container">
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-1-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M9.283 4.002H7.971L6.072 5.385v1.271l1.834-1.318h.065V12h1.312V4.002Z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-2-circle" viewBox="0 0 16 16">
+                                <path d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.646 6.24v.07H5.375v-.064c0-1.213.879-2.402 2.637-2.402 1.582 0 2.613.949 2.613 2.215 0 1.002-.6 1.667-1.287 2.43l-.096.107-1.974 2.22v.077h3.498V12H5.422v-.832l2.97-3.293c.434-.475.903-1.008.903-1.705 0-.744-.557-1.236-1.313-1.236-.843 0-1.336.615-1.336 1.306Z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-3-circle" viewBox="0 0 16 16">
+                                <path d="M7.918 8.414h-.879V7.342h.838c.78 0 1.348-.522 1.342-1.237 0-.709-.563-1.195-1.348-1.195-.79 0-1.312.498-1.348 1.055H5.275c.036-1.137.95-2.115 2.625-2.121 1.594-.012 2.608.885 2.637 2.062.023 1.137-.885 1.776-1.482 1.875v.07c.703.07 1.71.64 1.734 1.917.024 1.459-1.277 2.396-2.93 2.396-1.705 0-2.707-.967-2.754-2.144H6.33c.059.597.68 1.06 1.541 1.066.973.006 1.6-.563 1.588-1.354-.006-.779-.621-1.318-1.541-1.318Z"/>
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-4-circle" viewBox="0 0 16 16">
+                                <path d="M7.519 5.057c.22-.352.439-.703.657-1.055h1.933v5.332h1.008v1.107H10.11V12H8.85v-1.559H4.978V9.322c.77-1.427 1.656-2.847 2.542-4.265ZM6.225 9.281v.053H8.85V5.063h-.065c-.867 1.33-1.787 2.806-2.56 4.218Z"/>
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8"/>
+                            </svg>
+                        </div>
+                    </div>
+                {% elif request.user.profile == 1 %}
+                    <div class="setup-container">
+                        <svg width="40" height="40" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        <div class="setup-item-line-complete"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-2-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.646 6.24c0-.691.493-1.306 1.336-1.306.756 0 1.313.492 1.313 1.236 0 .697-.469 1.23-.902 1.705l-2.971 3.293V12h5.344v-1.107H7.268v-.077l1.974-2.22.096-.107c.688-.763 1.287-1.428 1.287-2.43 0-1.266-1.031-2.215-2.613-2.215-1.758 0-2.637 1.19-2.637 2.402v.065h1.271v-.07Z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-3-circle" viewBox="0 0 16 16">
+                                <path d="M7.918 8.414h-.879V7.342h.838c.78 0 1.348-.522 1.342-1.237 0-.709-.563-1.195-1.348-1.195-.79 0-1.312.498-1.348 1.055H5.275c.036-1.137.95-2.115 2.625-2.121 1.594-.012 2.608.885 2.637 2.062.023 1.137-.885 1.776-1.482 1.875v.07c.703.07 1.71.64 1.734 1.917.024 1.459-1.277 2.396-2.93 2.396-1.705 0-2.707-.967-2.754-2.144H6.33c.059.597.68 1.06 1.541 1.066.973.006 1.6-.563 1.588-1.354-.006-.779-.621-1.318-1.541-1.318Z"/>
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-4-circle" viewBox="0 0 16 16">
+                                <path d="M7.519 5.057c.22-.352.439-.703.657-1.055h1.933v5.332h1.008v1.107H10.11V12H8.85v-1.559H4.978V9.322c.77-1.427 1.656-2.847 2.542-4.265ZM6.225 9.281v.053H8.85V5.063h-.065c-.867 1.33-1.787 2.806-2.56 4.218Z"/>
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8"/>
+                            </svg>
+                        </div>
+                    </div>
+                {% elif request.user.profile == 2 %}
+                    <div class="setup-container">
+                        <svg width="40" height="40" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        <div class="setup-item-line-complete"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line-complete"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-3-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-8.082.414c.92 0 1.535.54 1.541 1.318.012.791-.615 1.36-1.588 1.354-.861-.006-1.482-.469-1.54-1.066H5.104c.047 1.177 1.05 2.144 2.754 2.144 1.653 0 2.954-.937 2.93-2.396-.023-1.278-1.031-1.846-1.734-1.916v-.07c.597-.1 1.505-.739 1.482-1.876-.03-1.177-1.043-2.074-2.637-2.062-1.675.006-2.59.984-2.625 2.12h1.248c.036-.556.557-1.054 1.348-1.054.785 0 1.348.486 1.348 1.195.006.715-.563 1.237-1.342 1.237h-.838v1.072h.879Z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-4-circle" viewBox="0 0 16 16">
+                                <path d="M7.519 5.057c.22-.352.439-.703.657-1.055h1.933v5.332h1.008v1.107H10.11V12H8.85v-1.559H4.978V9.322c.77-1.427 1.656-2.847 2.542-4.265ZM6.225 9.281v.053H8.85V5.063h-.065c-.867 1.33-1.787 2.806-2.56 4.218Z"/>
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8"/>
+                            </svg>
+                        </div>
+                    </div>
+                {% elif request.user.profile == 3 %}
+                    <div class="setup-container">
+                        <svg width="40" height="40" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        <div class="setup-item-line-complete"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line-complete"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="green" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                            </svg>
+                        </div>
+                        <div class="setup-item-line-complete"></div>
+                        <div class="setup-item-svg">
+                            <svg width="40" height="40" fill="#333" class="bi bi-4-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M7.519 5.057c-.886 1.418-1.772 2.838-2.542 4.265v1.12H8.85V12h1.26v-1.559h1.007V9.334H10.11V4.002H8.176c-.218.352-.438.703-.657 1.055ZM6.225 9.281v.053H8.85V5.063h-.065c-.867 1.33-1.787 2.806-2.56 4.218Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                {% endif %}
+    
+                <br><br>
+    
+                {% if request.user.profile == 0 %}
+                    <center>
+                        <h3>Let's start with your name:</h3>
+                    </center>
+                    <form action="{% url 'setup' %}" method="post" class="login-form">
+                        {% csrf_token %}
+                        <div class="group">
+                            <label for="number_str" class="label">What's your name?</label>
+                            <input type="text" name="name" class="input" placeholder="Enter your name..." maxlength="50" required>
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" name="first_name" value="Save">
+                        </div>
+                    </form>
+    
+                {% elif request.user.profile == 1 %}
+                <center>
+                    <h3>Is there anyone else in your team?</h3>
+                </center>
+                    {% for member in teammembers %}
+                        <p>
+                            &#8226; &nbsp; {{ member.name }}
+                        </p>   
+                    {% endfor %}
+                    
+                    <form action="{% url 'setup' %}" method="post" class="login-form">
+                        {% csrf_token %}
+                        <div class="group">
+                            <label for="name1" class="label">Do you have another team member?</label>
+                            <input type="text" name="name1" class="input" placeholder="" maxlength="50" required>
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" name="member_name" value="Add a team member">
+                        </div>
+                    </form>
+    
+                    <br>
+    
+                    <form action="{% url 'setup' %}" method="post" class="login-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="step" value="2">
+                        <div class="group">
+                            <input type="submit" class="button" name="next" value="Next">
+                        </div>
+                    </form>
+
+                    <br>
+    
+                {% elif request.user.profile == 2 %}
+                <center>
+                    <h3>How about a teamname? It's optional.</h3>
+                </center>
+                
+                    <form action="{% url 'setup' %}" method="post" class="login-form">
+                        {% csrf_token %}
+                        <div class="group">
+                            <label for="number_str" class="label">What's your teamname?</label>
+                            <input type="text" name="name" class="input" maxlength="50" required>
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" name="teamname" value="Save">
+                        </div>
+                    </form>
+    
+                    <br>
+    
+                    <form action="{% url 'setup' %}" method="post" class="login-form">
+                        {% csrf_token %}
+                        <input type="hidden" value="3" name="step">
+                        <div class="group">
+                            <input type="submit" class="button" name="next" value="Next">
+                        </div>
+                    </form>
+
+                {% elif request.user.profile == 3 %}
+                    <center>
+                        <h3>How about adding an avatar?</h3>
+                    </center>
+
+                    <div class="profile-team-member-container">
+
+                        {% for member in teammembers %}
+                            <div class="profile-team-member">
+                                <div class="profile-team-member-name profile-name-text-2">{{ member.name|title }}</div>
+                                
+                                <div class="profile-team-member-avatar">
+                                    {% if member.avatar %}
+                                        <img src="{{ member.avatar.url }}">
+                                    {% else %}
+                                        <img src="{% static 'images/default/default_avatar.png' %}">
+                                    {% endif %}    
+                                    <div class="profile-team-member-avatar-edit" onclick="showFieldProfileEdit(`profile-team-member-edit-{{ member.id }}`)">
+                                        <svg width="20" height="20" fill="#333" viewBox="0 0 16 16">
+                                            <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                                            <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0"/>
+                                        </svg>
+                                    </div>                
+                                </div> 
+                            </div>
+                        {% endfor %}
+        
+                    </div>
+
+                    
+                    <div id="profile-team-member-edit-overlay" class="profile-team-member-edit-overlay" style="display: none">
+                            
+                        <div>
+                            
+                            <br>
+                            {% for member in teammembers %}
+                                <div id="profile-team-member-edit-{{ member.id }}" class="profile-team-member-edit" style="display: none;">
+
+                                    <svg width="30" height="30" fill="#333" class="pointer" viewBox="0 0 16 16" onclick="hideFieldProfileEdit()">
+                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                    </svg>
+
+                                    <!-- Avatar -->
+                                    <h3>Add/Change Avatar</h3>
+                                    <form action="{% url 'setup' %}" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                    
+                                        <input type="file" class="profile-file-input" id="imageInput{{ member.id }}" name="image" accept="image/*" onchange="previewImage(`{{ member.id }}`)">
+                                        <label for="imageInput{{ member.id}}" class="button profile-button-label">Upload image</label>
+                                    
+                                        <div id="imagePreview{{ member.id }}"></div>
+                                    
+                                        <input type="hidden" name="id" value="{{ member.id }}">
+                                        <button type="submit" name="upload_avatar" id="saveImageButton{{ member.id }}" style="display: none;" class="button">Save image</button>
+                                    </form>
+                                    
+                                    <br>
+
+                                    {% if member.avatar %}
+                                        <h3>Delete existing avatar</h3>
+                                        <form action="{% url 'setup' %}" method="post" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="id" value="{{ member.id }}">
+                                            <button class="button" type="submit" name="delete_avatar">Delete avatar</button>
+                                        </form>
+                                    {% endif %}
+
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>     
+
+                    <br><br>
+                    <form action="{% url 'setup' %}" method="post" class="login-form">
+                        {% csrf_token %}
+                        <input type="hidden" value="4" name="step">
+                        <div class="group">
+                            <input type="submit" class="button" name="next" value="Next">
+                        </div>
+                    </form>
+
+                    <br>
+
+                {% endif %}         
+                
+            </div>   
+        </div>
+
+
+
+
+        <div class="main-layout-footer">
+            <p><a href="{% url 'logout' %}">Log out</a></p>
+        </div>
+
+    </div>
+
+    <!-- Required to execute the JavaScript-->
+    <script type="text/javascript" src="{% static 'scripts.js' %}"></script>
+
+</body>
+</html>

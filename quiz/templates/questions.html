@@ -1,0 +1,594 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ quiz.name }}
+{% endblock %}
+
+{% block body %}
+
+    <center>
+        <h1>{{ quiz_data.quiz.title }}</h1>
+        <h3>Question Number: {{ question_data.question_number}} </h3>
+    </center>
+    
+
+    <!-- Questions only visible in local mode for the host, or for all if in remote mode -->
+
+    {% if quiz_data.local_mode and request.user == quiz_data.host or not quiz_data.local_mode %}
+
+        <!-- Question Area -->
+        <div class="question-container">
+        {% if question_data.question_type == 1 %}
+            <!-- Type 1 being standard question (no sounds or image) -->
+            <div id="question" style="padding: 10px;">{{ question_data.question_text }}</div>
+        
+        {% elif question_data.question_type == 2 %}
+            <!-- Load an image and the text -->
+            <div id="question" style="padding: 10px;">{{ question_data.question_text }}</div>
+            <div class="question-image-container">
+                <img src="{{ question_data.image.url }}">
+            </div>
+
+        {% else %}
+            <!-- Load audio and the text -->
+            <div id="question" style="padding: 10px;">{{ question_data.question_text }}</div>
+            <div class="question-audio-container">
+                <audio controls>
+                    <source src="{{ question_data.audio.url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        {% endif %}
+        </div>
+
+    {% endif %}
+    
+    {% if quiz_data.local_mode and request.user != quiz_data.host and question_data.question_type == 3 %}
+        <!-- Audio playback for local mode devices -->
+        
+            <div class="question-audio-container">
+                <audio controls>
+                    <source src="{{ question_data.audio.url }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <br>
+        
+
+    {% endif %}
+
+    <!-- Answer Area -->
+
+    {% if quiz_data.local_mode and not request.user == quiz_data.host or not quiz_data.local_mode %}
+
+        {% if quiz_data.play_type == 0 %}
+            <!-- Hosted play answer submission-->
+
+            {% if quiz_data.play_type == 0 and quiz_data.multichoice_only == False and answer_data.question_step == 1 %}
+
+                <div id="timerContainer" class="question-timer-container">
+                    <div id="timer" class="question-timer-seconds">40</div>
+                    <div class="question-timer-text">SECONDS</div>
+                    <div style="display: inline-flex; flex-direction: row; align-items: center; justify-content: center; margin-top: 20px;">
+                        <div style="display: flex; justify-content: center; padding: 10px; ">
+                            <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            </svg>
+                        </div>
+                        <div>
+                            Enter an open answer before the timer expires <i><strong>or</strong></i> click to see the multiple choice answers
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Open choice is only possible on the initial load of the page. If refreshed, the question reverts to multiple-choice -->
+            
+                <div id="open-answer-container" style="position: relative;">
+                    <form onsubmit="return false;">
+                        <br><br>
+                        <label class="label">Enter your answer (or show multiple choice)</label>
+                        <input class="input" id="openAnswerField">{{ answer_data.given_answer }}</input>
+                        <button type="button" id="openButton1" class="button" style="margin-bottom: 10px;" onclick="submitOpen(`{{ answer_data.id }}`)" required>Submit Answer</button><br/>   
+                    </form>
+                    <button type="button" id="openButton2" class="button" onclick="seeMultichoice(`{{ answer_data.id }}`)">Show Multiple Choice Answers</button>
+                    <div id="openanswer-overlay-complete" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; background-color: rgba(241, 240, 236, 0.5);">
+                    </div>
+                </div>
+            
+                
+                <script>
+
+                    // Set the initial countdown value
+                    let countdown = 40; 
+                    let timerInterval;
+
+                    // ONLOAD PROCESSES
+                    document.addEventListener('DOMContentLoaded', function () {
+
+                        // Generate data
+                        data = {
+                            answer_id: `{{ answer_data.id }}`,
+                        }
+
+                        // Update answer state on the server
+                        fetch('/question_started', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                        })
+
+                        function updateTimer() {
+                            document.getElementById('timer').textContent = countdown;
+                            countdown--;
+
+                            // Check if the countdown has reached zero
+                            if (countdown < 0) {
+                                clearInterval(timerInterval); // Stop the timer
+
+                                // Hide the time and text box
+                                let timerContainer = document.getElementById('timerContainer');
+                                timerContainer.style.display = 'none';
+
+                                // Hide the open answers
+                                let openAnswersContainer = document.getElementById('open-answer-container');
+                                openAnswersContainer.style.display = 'none';
+
+                                // Call Multichoice function
+                                seeMultichoice(`{{ answer_data.id }}`);
+                            }
+                        }
+
+                        // Update the timer every second
+                        timerInterval = setInterval(updateTimer, 1000);
+                    })
+
+                    // Prevent submitting the wrong action
+                    function checkEnter(event, answerId) {
+                        if (event.key === "Enter") {
+                            event.preventDefault();
+                            submitOpen(answerId);
+                        }
+                    }
+
+                    // QUESTION HANDLING PROCESSES
+                    function submitOpen(answer_id) {
+                        let answer_value = document.getElementById("openAnswerField");
+                        let given_answer = answer_value.value
+                        let data = {
+                            answer_id: answer_id,
+                            given_answer: given_answer
+                        }
+                        fetch('/submit_open_answer', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({data}),
+                        });
+
+                        if (timerInterval) {
+                            clearInterval(timerInterval);
+                            document.getElementById('timerContainer').style.display = "none";
+                        }
+
+                        document.getElementById("openButton1").style.display = "none";
+                        document.getElementById("openButton2").style.display = "none";
+                        document.getElementById("openAnswerField").disabled = true;
+                        document.getElementById("openanswer-overlay-complete").style.display = "block";
+
+
+                        let questionComplete = document.getElementById("question-complete");
+                        questionComplete.style.display = "block";
+                    }
+
+                    function seeMultichoice(answer_id) {
+                        fetch('/see_multichoice_answers', {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({answer_id}),
+                            });
+
+                        if (timerInterval) {
+                            clearInterval(timerInterval);
+                            document.getElementById('timerContainer').style.display = "none";
+                        }
+
+                        let hideOpenAnswer = document.getElementById("open-answer-container");
+                        hideOpenAnswer.style.display = "none";
+
+                        let showMultichoice = document.getElementById("answers");
+                        showMultichoice.style.display = "block";
+                    }
+
+                </script>
+            
+            {% elif quiz_data.play_type == 0 and quiz_data.multichoice_only == False and answer_data.question_step == 4 and answer_data.answer_type == 1 %}
+
+                <div id="open-answer-container" style="display: block; position: relative;">
+                    <form>
+                        <label class="label">Enter your answer (or show multiple choice)</label>
+                        <input class="input" id="openAnswerField" readonly value="{{ answer_data.given_answer }}"></input>
+                    </form>
+                    <div id="openanswer-overlay-complete" style="display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; background-color: rgba(241, 240, 236, 0.5);">
+                    </div>
+                </div>
+        
+            {% endif %}
+
+            {% if answer_data.question_step == 2 or answer_data.question_step == 4 and answer_data.answer_type != 1 %}
+                <div id="answers" style="display: block; width: 100%; position: relative;">
+            {% else %}
+                <div id="answers" style="display: none; width: 100%; position: relative;">
+            {% endif %}
+
+                <div class="question-multiple-choice">
+                    <form>
+                        <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}"> 
+                        <input type="hidden" name="question_id" value="{{ question_data.id }}">
+                        <span class="label" style="margin-bottom: 5px;">Please select one of the available answers:</span>
+                        <input type="radio" name="answer" value="1" id="answer1" {% if answer_data.given_answer == question_data.answer1 %}checked{% endif %}>
+                        <label for="answer1"> {{ question_data.answer1 }}</label>
+            
+                        <input type="radio" name="answer" value="2" id="answer2" {% if answer_data.given_answer == question_data.answer2 %}checked{% endif %}>
+                        <label for="answer2"> {{ question_data.answer2 }}</label>
+                    
+                        <input type="radio" name="answer" value="3" id="answer3" {% if answer_data.given_answer == question_data.answer3 %}checked{% endif %}>
+                        <label for="answer3"> {{ question_data.answer3 }}</label>
+                    
+                        <input type="radio" name="answer" value="4" id="answer4" {% if answer_data.given_answer == question_data.answer4 %}checked{% endif %}>
+                        <label for="answer4"> {{ question_data.answer4 }}</label>
+                
+                        {% if answer_data.question_step != 4 %}
+                        <button id="submit-button" type="button" class="button" onclick="submitAnswer()">Submit Answer</button>
+                        {% endif %}
+                    </form>
+
+                    {% if answer_data.question_step != 4 %}
+                        <div id="answer-overlay-complete" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; background-color: rgba(241, 240, 236, 0.5);">
+                        </div>
+                    {% else %}
+                        <div id="answer-overlay-complete" style="display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; background-color: rgba(241, 240, 236, 0.5);">
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if answer_data.question_step != 4 %}
+                <div id="question-complete" style="display: none;">
+            {% else %}
+                <div id="question-complete" style="display: block;">
+            {% endif %}
+                
+                    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">                    
+                        <div style="display: flex; align-items: center;">
+                            <svg width="18" height="18" fill="green" viewBox="0 0 16 16" style="vertical-align: middle;">
+                                <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5z"/>
+                                <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0"/>                              
+                            </svg>                        
+                        </div>
+                        <div style="padding-left: 10px;;">
+                            <p>Your answer has been submitted. Please wait for the next question.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+                        <div style="color: #666; font-style: italic;">
+                            If the page doesn't refresh, click here: &nbsp;
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <a href="{% url 'quiz_redirection' quiz_data.id %}">
+                                <svg width="18" height="18" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" style="vertical-align: middle;">
+                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            <script>
+
+                function submitAnswer() {
+                    // Get the selected radio button value
+                    let selectedValue = document.querySelector('input[name="answer"]:checked');
+                    let given_answer = "";
+        
+                    if (selectedValue) {
+                        given_answer = selectedValue.value;
+                    } else {
+                        given_answer = "None"; 
+                    }
+        
+                    let data = {
+                        quiz_id: document.querySelector('input[name="quiz_id"]').value,
+                        question_id: document.querySelector('input[name="question_id"]').value,
+                        given_answer: given_answer,
+                    }
+        
+                    fetch('/submit_multi_answer', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ data }),
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Handle success
+
+                            let radioButtons = document.getElementsByName("answer");
+
+                            for (var i = 0; i < radioButtons.length; i++) {
+                                radioButtons[i].disabled = true;
+                            }
+
+                            document.getElementById("submit-button").style.display = 'none';
+                            document.getElementById("answer-overlay-complete").style.display = 'block';
+                            
+                            document.getElementById("question-complete").style.display = 'block';
+
+                            if (data.redirect === true ) {
+                                window.location.href = `/quiz_redirection/${data.quiz_id}`;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+        
+            </script>
+
+        {% elif quiz_data.play_type == 1 %} 
+
+            
+            <div id="answers" style="display: block; width: 100%; position: relative;">
+    
+                <div class="question-multiple-choice">
+                    <form>
+                        <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}"> 
+                        <input type="hidden" name="question_id" value="{{ question_data.id }}">
+                        <span class="label" style="margin-bottom: 5px;">Please select one of the available answers:</span>
+                        <input type="radio" name="answer" value="1" id="answer1" {% if answer_data.given_answer == question_data.answer1 %}checked{% endif %}>
+                        <label for="answer1"> {{ question_data.answer1 }}</label>
+            
+                        <input type="radio" name="answer" value="2" id="answer2" {% if answer_data.given_answer == question_data.answer2 %}checked{% endif %}>
+                        <label for="answer2"> {{ question_data.answer2 }}</label>
+                    
+                        <input type="radio" name="answer" value="3" id="answer3" {% if answer_data.given_answer == question_data.answer3 %}checked{% endif %}>
+                        <label for="answer3"> {{ question_data.answer3 }}</label>
+                    
+                        <input type="radio" name="answer" value="4" id="answer4" {% if answer_data.given_answer == question_data.answer4 %}checked{% endif %}>
+                        <label for="answer4"> {{ question_data.answer4 }}</label>
+                
+                        {% if answer_data.question_step != 4 %}
+                        <button id="submit-button" type="button" class="button" onclick="submitAnswer()">Submit Answer</button>
+                        {% endif %}
+                    </form>
+
+                    {% if answer_data.question_step != 4 %}
+                        <div id="answer-overlay-complete" style="display: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; background-color: rgba(241, 240, 236, 0.5);">
+                        </div>
+                    {% else %}
+                        <div id="answer-overlay-complete" style="display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; background-color: rgba(241, 240, 236, 0.5);">
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+    
+            {% if answer_data.question_step != 4 %}
+                <div id="question-complete" style="display: none;">
+            {% else %}
+                <div id="question-complete" style="display: block;">
+            {% endif %}
+                
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">                    
+                    <div style="display: flex; align-items: center;">
+                        <svg width="18" height="18" fill="green" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5z"/>
+                            <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0"/>                              
+                        </svg>                        
+                    </div>
+                    <div style="padding-left: 10px;;">
+                        <p>Your answer has been submitted. Please wait for the next question.</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+                    <div style="color: #666; font-style: italic;">
+                        If the page doesn't refresh, click here: &nbsp;
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <a href="{% url 'quiz_redirection' quiz_data.id %}">
+                            <svg width="18" height="18" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" style="vertical-align: middle;">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <script>
+
+                function submitAnswer() {
+                    // Get the selected radio button value
+                    let selectedValue = document.querySelector('input[name="answer"]:checked');
+                    let given_answer = "";
+        
+                    if (selectedValue) {
+                        given_answer = selectedValue.value;
+                    } else {
+                        given_answer = "None"; 
+                    }
+        
+                    let data = {
+                        quiz_id: document.querySelector('input[name="quiz_id"]').value,
+                        question_id: document.querySelector('input[name="question_id"]').value,
+                        given_answer: given_answer,
+                    }
+        
+                    fetch('/submit_multi_answer', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ data }),
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Handle success
+
+                            let radioButtons = document.getElementsByName("answer");
+
+                            for (var i = 0; i < radioButtons.length; i++) {
+                                radioButtons[i].disabled = true;
+                            }
+
+                            document.getElementById("submit-button").style.display = 'none';
+                            document.getElementById("answer-overlay-complete").style.display = 'block';
+                            
+                            document.getElementById("question-complete").style.display = 'block';
+
+                            if (data.redirect === true ) {
+                                window.location.href = `/quiz_redirection/${data.quiz_id}`;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+        
+            </script>
+                
+        {% else %}
+            <!-- Solo play answer submission -->
+                    
+            <div class="question-multiple-choice">
+            
+                <form action="{% url 'question' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}"> 
+                    <input type="hidden" name="question_id" value="{{ question_data.id }}"> 
+                                
+                    <input type="radio" name="answer" id="answer1" value="1">
+                    <label for="answer1">
+                    {{ question_data.answer1 }}
+                    </label>
+                    
+                    <input type="radio" name="answer" id="answer2" value="2">
+                    <label for="answer2">
+                        {{ question_data.answer2 }}
+                    </label>
+                    
+                    <input type="radio" name="answer" id="answer3" value="3">
+                    <label for="answer3">
+                        {{ question_data.answer3 }}
+                    </label>
+                    
+                    <input type="radio" name="answer" id="answer4" value="4">
+                    <label for="answer4">
+                        {{ question_data.answer4 }}
+                    </label>
+                
+                    <button type="submit" class="button" name="submit_question_multi">Submit Answer</button>
+                </form>
+
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+
+    
+    {% if quiz_data.play_type != 2 %}
+        <!-- Deactivated for solo play through -->
+        {% if quiz_data.local_mode and quiz_data.host == request.user %}
+        
+            <!-- Determines if the quiz is ready to start, and forwards the user accordingly -->
+            <script>
+
+                // Checks to see if quiz status has changed from waiting.
+                function nextQuestion(quiz_id, question_id) {
+
+                    let data = {
+                        quiz_id: parseInt(quiz_id, 10),
+                        question_number: parseInt(question_id, 10),
+                    }
+
+                    fetch('/forward_question', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    }) 
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.forward === true) {
+                            window.location.href = `/quiz_redirection/${data.quiz_id}`; 
+                        } 
+                    })
+                    .catch(error => console.error('Error:', error));
+                    }
+
+                setInterval(function() {nextQuestion(`{{ quiz_data.id}}`, `{{ question_data.id }}`);
+                }, 1000); //
+            </script>
+
+        {% else %}
+
+            <!-- Determines if the quiz is ready to start, and forwards the user accordingly -->
+            <script>
+
+                // Checks to see if quiz status has changed from waiting.
+                function nextQuestion(quiz_id, question_id) {
+    
+                    let data = {
+                        quiz_id: parseInt(quiz_id, 10),
+                        question_number: parseInt(question_id, 10),
+                    }
+    
+                    fetch('/forward_question', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    }) 
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.forward === true) {
+                            window.location.href = `/quiz_redirection/${data.quiz_id}`; 
+                        } 
+                    })
+                    .catch(error => console.error('Error:', error));
+                    }
+    
+                setInterval(function() {nextQuestion(`{{ quiz_data.id}}`, `{{ question_data.id }}`);
+                }, 5000); //
+            </script>
+
+        {% endif %}
+
+    {% endif %}
+
+    <br>
+
+{% endblock %}

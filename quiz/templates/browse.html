@@ -1,0 +1,679 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Browse
+{% endblock %}
+
+{% block body %}
+        
+    <div class="browse-page-layout-container">
+
+        <div class="browse-page-menu-container">
+            
+            <div class="browse-page-menu-pc">
+                
+                <div style="display: flex; flex-direction:row; align-items: center; margin-bottom: 20px;">
+                    <div style="margin-left: 10px;">
+                        <svg width="25" height="25" fill="#E8532F" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span style="font-size: 1em; color: #333; font-style: normal; font-weight: bold; margin-left: 10px;">
+                            {{ quiz_count }} {% if quiz_count == 1%}QUIZ{% else %}QUIZZES{% endif %}
+                        </span>  
+                    </div>                                      
+                </div>
+
+                {% if filter_text %}
+                    <div style="color: #333; font-size: 0.8em; font-style: normal; font-weight: bold; text-align: left; margin-bottom: 20px;">
+                        {{ filter_text}}
+                    </div> 
+                {% endif %}
+
+                <div style="margin-bottom: 5px;">
+                    Sort by
+                </div>
+
+                <div>
+                    <form id="sort-by1" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <select name="sort-by" style="width:100%; padding: 5px; border: 1px solid #E8532F;" onchange="submitForm('sort-by1')">
+                            <option value="" disabled selected>Select sorting</option>
+                            <option value="most-popular">Most popular</option>
+                            <option value="average-review">Average review</option>
+                            <option value="created-on-descending">Created on (new to old)</option>
+                            <option value="created-on-ascending">Created on (old to new)</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div style="margin-top: 20px; margin-bottom: 5px;">
+                    Category
+                </div>
+                <div>
+                    <form id="quiz-category1" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}                    
+                        <select name="quiz-category" style="padding: 5px; border: 1px solid #E8532F; width: 100%;" onchange="submitForm('quiz-category1')">
+                            <option value="" disabled selected>Select category</option>
+                            <option value="General-Knowledge">General Knowledge</option>
+                            <option value="Science-and-Nature">Science And Nature</option>
+                            <option value="History">History</option>
+                            <option value="Geography">Geography</option>
+                            <option value="Literature">Literature</option>
+                            <option value="Movies">Movies</option>
+                            <option value="Music">Music</option>
+                            <option value="Art-and-Culture">Art And Culture</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Food-and-Cooking">Food And Cooking</option>
+                            <option value="Animals">Animals</option>
+                            <option value="Mythology">Mythology</option>
+                            <option value="Language-and-Linguistics">Language And Linguistics</option>
+                            <option value="Famous-People">Famous People</option>
+                            <option value="Current-Events">Current Events</option>
+                            <option value="Politics">Politics</option>
+                            <option value="Health-and-Fitness">Health And Fitness</option>
+                            <option value="Travel-and-Tourism">Travel And Tourism</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Pop-Culture">Pop Culture</option>
+                            <option value="Celebrities">Celebrities</option>
+                            <option value="TV-Shows">TV Shows</option>
+                            <option value="Video-Games">Video Games</option>
+                            <option value="Comics-and-Graphic-Novels">Comics And Graphic Novels</option>
+                            <option value="Hobbies-and-Interests">Hobbies And Interests</option>
+                            <option value="Philosophy">Philosophy</option>
+                            <option value="Religion-and-Spirituality">Religion And Spirituality</option>
+                            <option value="Architecture">Architecture</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div style="margin-top: 20px; margin-bottom: 5px;">
+                    Rating
+                </div>
+
+                <form id="review-5-star-1" action="{% url 'browse' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" value="5">
+                    <div class="pointer" style="width: fit-content;" onclick="submitForm('review-5-star-1')">
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange"viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>                       
+                    </div>
+                </form>
+
+                <form id="review-4-star-1" action="{% url 'browse' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" value="4">
+                    <div class="pointer" style="width: fit-content;" onclick="submitForm('review-4-star-1')">
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                    </div>
+                </form>
+    
+                <form id="review-3-star-1" action="{% url 'browse' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" value="3">
+                    <div class="pointer" style="width: fit-content;" onclick="submitForm('review-3-star-1')">
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                    </div>
+                </form>
+
+                <form id="review-2-star-1" action="{% url 'browse' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" value="2">
+                    <div class="pointer" style="width: fit-content;" onclick="submitForm('review-2-star-1')">
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>                    
+                    </div>
+                </form>
+    
+                <form id="review-1-star-1" action="{% url 'browse' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" value="1">
+                    <div class="pointer" style="width: fit-content;" onclick="submitForm('review-1-star-1')">
+                        <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                        <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                    </div>
+                </form>
+                    
+                <form id="review-0-star-1" action="{% url 'browse' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="rating" value="0">
+                    <div style="font-size: 0.8em; font-style: normal; color: #777; width: fit-content;"  class="pointer" onclick="submitForm('review-0-star-1')">
+                        Unrated
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="browse-page-menu-mobile">
+                <div style="display: flex; flex-direction: row; align-items: center">
+                    <div style="flex: 1;">
+                        <button class="browse-filter-button" onclick="toggleMenu()">FILTER</button>
+                    </div>
+                    <div>
+                        Sort by 
+                    </div>
+                    <div style="margin-left: 10px;">
+                        <form id="sort-by2" action="{% url 'browse' %}" method="post">
+                            {% csrf_token %}
+                            <select name="sort-by" style="padding: 5px; border: 1px solid #E8532F;" onchange="submitForm('sort-by2')">
+                                <option value="" disabled selected>Select sorting</option>
+                                <option value="most-popular">Most popular</option>
+                                <option value="average-review">Average review</option>
+                                <option value="created-on-descending">Created on (new to old)</option>
+                                <option value="created-on-ascending">Created on (old to new)</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+                <div id="browse-mobile-filter-area" style="display: none; flex-direction: column; margin-top: 10px;">
+                    <div style="margin-top: 20px; margin-bottom: 5px;">
+                        Category
+                    </div>
+                    <div>
+                        <form id="quiz-category2" action="{% url 'browse' %}" method="post">
+                            {% csrf_token %}
+                            <select name="quiz-category" style="padding: 5px; border: 1px solid #E8532F; width: 100%;" onchange="submitForm('quiz-category2')">
+                                <option value="" disabled selected>Select category</option>
+                                <option value="General-Knowledge">General Knowledge</option>
+                                <option value="Science-and-Nature">Science And Nature</option>
+                                <option value="History">History</option>
+                                <option value="Geography">Geography</option>
+                                <option value="Literature">Literature</option>
+                                <option value="Movies">Movies</option>
+                                <option value="Music">Music</option>
+                                <option value="Art-and-Culture">Art And Culture</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Food-and-Cooking">Food And Cooking</option>
+                                <option value="Animals">Animals</option>
+                                <option value="Mythology">Mythology</option>
+                                <option value="Language-and-Linguistics">Language And Linguistics</option>
+                                <option value="Famous-People">Famous People</option>
+                                <option value="Current-Events">Current Events</option>
+                                <option value="Politics">Politics</option>
+                                <option value="Health-and-Fitness">Health And Fitness</option>
+                                <option value="Travel-and-Tourism">Travel And Tourism</option>
+                                <option value="Fashion">Fashion</option>
+                                <option value="Pop-Culture">Pop Culture</option>
+                                <option value="Celebrities">Celebrities</option>
+                                <option value="TV-Shows">TV Shows</option>
+                                <option value="Video-Games">Video Games</option>
+                                <option value="Comics-and-Graphic-Novels">Comics And Graphic Novels</option>
+                                <option value="Hobbies-and-Interests">Hobbies And Interests</option>
+                                <option value="Philosophy">Philosophy</option>
+                                <option value="Religion-and-Spirituality">Religion And Spirituality</option>
+                                <option value="Architecture">Architecture</option>
+                            </select>
+                        </form>
+                    </div>
+    
+                    <div style="margin-top: 20px; margin-bottom: 5px;">
+                        Rating
+                    </div>
+    
+                    <form id="review-5-star-2" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="rating" value="5">
+                        <div class="pointer" style="width: fit-content;" onclick="submitForm('review-5-star-2')">
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange"viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>                       
+                        </div>
+                    </form>
+    
+                    <form id="review-4-star-2" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="rating" value="4">
+                        <div class="pointer" style="width: fit-content;" onclick="submitForm('review-4-star-2')">
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                        </div>
+                    </form>
+        
+                    <form id="review-3-star-2" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="rating" value="3">
+                        <div class="pointer" style="width: fit-content;" onclick="submitForm('review-3-star-2')">
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                        </div>
+                    </form>
+
+                    <form id="review-2-star-2" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="rating" value="2">
+                        <div class="pointer" style="width: fit-content;" onclick="submitForm('review-2-star-2')">
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>                    
+                        </div>
+                    </form>
+        
+                    <form id="review-1-star-2" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="rating" value="1">
+                        <div class="pointer" style="width: fit-content;" onclick="submitForm('review-1-star-2')">
+                            <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                            <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                            </svg>
+                        </div>
+                    </form>
+                        
+                    <form id="review-0-star-2" action="{% url 'browse' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="rating" value="0">
+                        <div style="font-size: 0.8em; font-style: normal; color: #777; width: fit-content;"  class="pointer" onclick="submitForm('review-0-star-2')">
+                            Unrated
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="browse-page-content-container">
+            <div class="browse-item-count-mobile">
+                <div style="display: flex; flex-direction:row; align-items: center; margin-bottom: 20px;">
+                    <div style="margin-left: 10px;">
+                        <svg width="25" height="25" fill="#E8532F" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span style="font-size: 1em; color: #333; font-style: normal; font-weight: bold; margin-left: 10px;">
+                            {{ quiz_count }} {% if quiz_count == 1%}QUIZ{% else %}QUIZZES{% endif %}
+                        </span>  
+                    </div>                                      
+                </div>
+            </div>      
+        
+            <div class="hidden-pc">
+                {% if filter_text %}
+                    <div style="color: #333; font-size: 0.8em; font-style: italic; font-weight: bold; text-align: right; margin-bottom: 10px;">
+                        {{ filter_text}}
+                    </div> 
+                {% endif %}
+            </div>
+            
+            {% if not filter_text %}
+            <center>
+                <h3>Browse Quizzes</h3>
+            </center>
+            {% endif %}
+
+            <div class="myquiz-card-container">
+                {% for quiz in quizzes %}
+                    
+                <div class="myquiz-card">
+                        
+                    <div class="myquiz-card-contents">
+                        
+                        <div class="myquiz-title">
+                            {{ quiz.title }}
+                        </div>                        
+                        <div class="myquiz-date">
+                            {{ quiz.created_on|date:"d F Y"}}
+                        </div>
+                        {% if quiz.description %}
+                            <div class="myquiz-description">
+                                {{ quiz.description }}
+                            </div>
+                        {% else %}
+                            <div class="myquiz-description">
+                                No description.                             
+                            </div>
+                        {% endif %}
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            AUTHOR
+                        </div>
+                        <div class="myquiz-small-text">
+                            {% if quiz.author.public_host_name %}
+                                {{ quiz.author.public_host_name }}
+                            {% else %}
+                                {{ quiz.author.username }}
+                            {% endif %}
+                        </div>
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            REVIEWS
+                        </div>
+                        <div class="myquiz-small-text" style="display: flex; align-items: center;">
+                            {% if quiz.avg_rating %}
+                                {% if quiz.avg_rating < 2 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 2 and quiz.avg_rating < 3 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg> &nbsp; 
+                                {% elif quiz.avg_rating >= 3 and quiz.avg_rating < 4 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4 and quiz.avg_rating < 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange"viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% endif %}
+                            {% else %}
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                
+                            {% endif %}
+                            ({{ quiz.quizreviews_set.all|length }})
+                        </div>
+                        <div class="myquiz-small-title">
+                            QUESTIONS
+                        </div>
+                        <div class="myquiz-small-text">
+                            {{ quiz.get_question_count }}
+                        </div>
+                        <div class="myquiz-small-title">
+                            CATEGORIES 
+                        </div>
+                        <div class="myquiz-categories-container">
+                            {% if quiz.category1 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category1 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.category2 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category2 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.category3 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category3 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.category4 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category4 }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    
+                    </div>
+                    <div class="myquiz-bottom-buttons-container">
+                        <div class="myquiz-bottom-buttons-column">
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Play Solo
+                            </div>
+                            <div>
+                                <form action="{% url 'browse' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                    <input type="hidden" name="player">
+                                    <button type="submit" class="button-svg" style="background-color: transparent;">
+                                        <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                        </svg>
+                                    </button>
+                                </form>                                        
+                            </div>
+                        </div>
+                        
+                        <div class="myquiz-bottom-buttons-column">
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Play With Friends
+                            </div>
+                            <div>
+                                <form action="{% url 'browse' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                    <input type="hidden" name="host">
+                                    <button type="submit" class="button-svg" style="background-color: transparent;">
+                                        <svg width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {% endfor %}
+            </div>
+
+        </div>
+
+        
+        <!--Inspiration: https://www.waterstones.com/category/gift-books -->
+
+    </div>
+
+    <script>
+    // Show or hide mobile filter element
+    function toggleMenu() {
+        let show = document.getElementById('browse-mobile-filter-area');
+
+        if (show.style.display === 'none') {
+            show.style.display = 'flex';
+        } else {
+            show.style.display = 'none';
+        }    
+    }
+
+    
+    function submitForm(formName) {
+        document.getElementById(`${formName}`).submit();
+    }
+
+
+    </script>
+    
+{% endblock %}

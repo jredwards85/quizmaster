@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quiz Registration
+{% endblock %}
+
+{% block body %}
+
+    <center>
+        <h1>Quiz Registration</h1>
+
+        <h3>{{ quiz_data.quiz.title }}</h3>
+        {% if quiz_data.quiz.author == quiz_data.host %}
+            <p>Created and hosted by 
+                {% if quiz_data.host.public_host_name %}
+                    {{ quiz_data.host.public_host_name }}
+                {% else %}
+                    {{ quiz_data.host.username }}
+                {% endif %}
+                </p>
+        {% else %}
+            <p>Created by 
+                {% if quiz_data.quiz.author.public_host_name %}
+                    {{ quiz_data.quiz.author.public_host_name }}
+                {% else %}
+                    {{ quiz_data.quiz.author.username }}
+                {% endif %}
+                and hosted by 
+                {% if quiz_data.host.public_host_name %}
+                    {{ quiz_data.host.public_host_name }}
+                {% else %}
+                    {{ quiz_data.host.username }}
+                {% endif %}
+            </p>
+        
+        {% endif %}
+
+
+        <br>
+        <p>This quiz is password protected. Registration is only possible after providing the password.</p>
+        <br>
+    </center>
+    
+
+    <form action="{% url 'quiz_registration' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="quiz_id" value="{{ quiz_data.id}}">
+        <label class="label">Enter password to register to this quiz</label>
+        <input type="password" class="input" name="password" required>
+        <button type="submit" class="button" name="register">Register</button>
+    </form>
+
+{% endblock %}

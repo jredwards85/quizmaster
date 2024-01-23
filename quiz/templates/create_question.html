@@ -1,0 +1,168 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Question Creation
+{% endblock %}
+
+{% block body %}
+    
+    <center>
+        <h1>Questions</h1>
+    </center>
+
+    <form action="{% url 'create' %}" method="post" class="login-form" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="group">
+            <label for="title" class="label">Quiz Title</label>
+            <input type="text" name="title" class="input" value="{{ quiz_data.title }}" readonly style="background-color: #DDD;">
+        </div>
+
+        <div class="group">
+            <label for="number" class="label">Question Number</label>
+            <input type="number" name="number" class="input" placeholder="Please enter the question number (this should be unique)." value="{{ question_number }}" required {% if quiz_data.edit_only %}readonly{% endif %}>
+        </div>
+
+        <div class="group" {% if quiz_data.edit_only %}style="display: none;"{% endif %}>
+            <label for="questionType" class="label">Select the question type</label><br>
+            <select id="questionType" name="question_type" class="select" required>
+                <option value="1" {% if question_data.question_type == 1 or question_data.question_type == None %} selected {% endif %}>Text based question (standard)</option>
+                <option value="2" {% if question_data.question_type == 2 %} selected {% endif %}>With image file (image upload required)</option>
+                <option value="3" {% if question_data.question_type == 3 %} selected {% endif %}>With audio file (audio upload required)</option>
+            </select>
+        </div>
+
+        <div class="group">
+            <label for="question" class="label">Question</label>
+            <input type="text" id="question" name="question" class="input" maxlength="200" placeholder="Please enter the question here." oninput="countCharacters('question','charCountQuestion')" 
+            value="{{ question_data.question_text }}" required>
+        </div>
+        <p id="charCountQuestion" class="counter" style="display: none;">Character count: 0/200</p>
+
+        <div class="group">
+            <label for="answer1" class="label">Answer option 1</label>
+            <input type="text" id="questionAnswer1" name="answer1" class="input" maxlength="200" placeholder="Please enter a possible answer." oninput="countCharacters('questionAnswer1','charCountAnswer1')" 
+            value="{{ question_data.answer1 }}" required>
+        </div>
+        <p id="charCountAnswer1" class="counter" style="display: none;">Character count: 0/200</p>
+
+        <div class="group">
+            <label for="answer2" class="label">Answer option 2</label>
+            <input type="text" id="questionAnswer2" name="answer2" class="input" maxlength="200" placeholder="Please enter a possible answer." oninput="countCharacters('questionAnswer2','charCountAnswer2')"
+            value="{{ question_data.answer2 }}"  required>
+        </div>
+        <p id="charCountAnswer2" class="counter" style="display: none;">Character count: 0/200</p>
+
+        <div class="group">
+            <label for="answer3" class="label">Answer option 3</label>
+            <input type="text" id="questionAnswer3" name="answer3" class="input" maxlength="200" placeholder="Please enter a possible answer." oninput="countCharacters('questionAnswer3','charCountAnswer3')"
+            value="{{ question_data.answer3 }}" required>
+        </div>
+        <p id="charCountAnswer3" class="counter" style="display: none;">Character count: 0/200</p>
+
+        <div class="group">
+            <label for="answer4" class="label">Answer option 4</label>
+            <input type="text" id="questionAnswer4" name="answer4" class="input" maxlength="200" placeholder="Please enter a possible answer." oninput="countCharacters('questionAnswer4','charCountAnswer4')"
+            value="{{ question_data.answer4 }}" required>
+        </div>
+        <p id="charCountAnswer4" class="counter" style="display: none;">Character count: 0/200</p>
+
+        <div class="group" {% if quiz_data.edit_only %}style="display: none;"{% endif %}>
+            <label for="answer" class="label">Select the correct answer</label><br>
+            <select id="questionAnswerSelect" name="answer" class="select" required>
+                <option value="" disabled {% if question_data == None %} selected {% else %} {% endif %}>Select an answer</option>
+                <option value="1" {% if question_data.correct_answer == 1 %} selected {% endif %}>Answer 1</option>
+                <option value="2" {% if question_data.correct_answer == 2 %} selected {% endif %}>Answer 2</option>
+                <option value="3" {% if question_data.correct_answer == 3 %} selected {% endif %}>Answer 3</option>
+                <option value="4" {% if question_data.correct_answer == 4 %} selected {% endif %}>Answer 4</option>
+            </select>
+        </div>
+
+        <div id="questionImageField" class="group" {% if question_data.question_type == 2 %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+            
+            <label for="imageFile" class="choose-file">Choose Image File</label>
+            <input type="file" id="imageFile" name="image" accept="image/*">
+
+            <input type="hidden" name="image-previous" value="{% if question_data.image%}True{% else %}False{% endif %}">
+
+            <div class="image-preview" id="imagePreview">
+                {% if question_data.image %}
+                    <img src="{{ question_data.image.url }}" class="image-preview">
+                {% else %}
+                {% endif %}
+            </div>
+
+            <script>
+                document.getElementById('imageFile').addEventListener('change', function() {
+                    var imagePreview = document.getElementById('imagePreview');
+                    
+                    // Image file name preview
+                    if (this.files.length > 0) {
+                        var reader = new FileReader();            
+                        reader.onload = function(e) {
+                            imagePreview.innerHTML = '<img src="' + e.target.result + '" alt="Image Preview" class="image-preview">';
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    } else {
+                        imagePreview.innerHTML = '';
+                    }
+                });
+            </script>
+        </div>
+
+        <div id="questionAudioField" class="group" {% if question_data.question_type == 3 %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+            
+            <label for="audioFile" class="choose-file">Select an audio file</label>
+            <input type="file" id="audioFile" name="audio" accept="audio/*">
+
+            <input type="hidden" name="audio-previous" value="{% if question_data.audio%}True{% else %}False{% endif %}">
+                        
+            <div class="image-preview" id="fileNameDisplay">
+                {% if question_data.audio %}
+                    
+                    {{ file_name }}
+                {% else %}
+                {% endif %}
+            </div>            
+
+            <script>
+                // Audio file name preview
+                document.getElementById('audioFile').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    document.getElementById('fileNameDisplay').innerText = this.files[0].name;
+                } else {
+                    document.getElementById('fileNameDisplay').innerText = '';
+                }
+            });
+            </script>
+
+        </div>
+        
+        <input type="hidden" name="question_id" value="{{ question_data.id }}">
+        <input type="hidden" name="id" value="{{ quiz_data.id }}">
+
+        {% if not quiz_data.edit_only%}
+        <div class="group">
+            <input type="submit" class="button" name="submit_question" value="Save and add another question">
+        </div>
+        {% endif %}
+
+        <div class="group">
+            <input type="submit" class="button" name="submit_question_2" value="Save and exit">
+        </div>
+
+    </form>
+
+    <form action="{% url 'create' %}" method="post" class="login-form" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="group">
+            <input type="hidden" name="quiz_id" value="{{ quiz_data.id }}">
+            <input type="submit" class="button" name="cancel" value="Cancel">
+        </div>
+        
+    </form>
+
+    <br>
+
+{% endblock %}

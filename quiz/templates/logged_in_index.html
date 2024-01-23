@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    The Quiz Boutique
+{% endblock %}
+
+{% block body %}
+
+    <div class="cover-container">
+
+        {% if cover_data %}
+            <img src="{{ cover_data.image.url}}" class="cover-image" alt="Cover Image">
+        {% else %}
+            <img src="{% static 'images/site/default-cover.jpg' %}" class="cover-image" alt="Cover Image">
+        {% endif %}
+
+        <div class="cover-text">
+            
+            <div>
+                <center>
+                    {% if cover_data %}
+                    <p class="cover-text-main">{{ cover_data.text}}</p>
+                    
+                    <p class="cover-text-minor">from the Quiz Boutique</p>
+                    {% else%}
+                    <p class="cover-text-main">Welcome</p>
+                    
+                    <p class="cover-text-minor">to the Quiz Boutique</p>
+                    {% endif %}
+                </center>
+            </div>
+        </div>
+
+        <div id="cover-highlights-pc" class="cover-highlights-pc">
+            <div class="cover-highlights-pc-contents">
+
+                <div class="cover-highlights-pc-item">
+                    {% if showcase_status %} 
+                        <a href="{% url 'join_quiz' showcase_data.quiz_instance.id %}">
+                    {% else %}
+                        <a href="{% url 'my_quizzes' %}">
+                    {% endif %}
+                    
+                        {% if showcase_status %} 
+                            <img src="{% static 'images/site/join.jpg' %}" alt="Join the showcase quiz...">
+                            <p>Join The Showcase Quiz</p>
+                        {% else %}
+                            <img src="{% static 'images/site/join.jpg' %}" alt="Join one of your quizzes...">
+                            <p>Your Quizzes</p>
+                        {% endif %}
+                        <hr>
+                    </a>
+                </div>
+            
+            
+                <div class="cover-highlights-pc-item">
+                    <a href="{% url 'browse' %}"> 
+                        <img src="{% static 'images/site/browse.jpg' %}" alt="Browse all available quizzes...">
+                        <p>Browse Quizzes</p>
+                        <hr>
+                    </a>
+                </div>
+            
+            
+                <div class="cover-highlights-pc-item">
+                    <a href="{% url 'create' %}"> 
+                        <img src="{% static 'images/site/create.jpg' %}" alt="Create your own quiz...">
+                        <p>Create Your Own Quiz</p>
+                        <hr>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="cover-highlights-mobile">
+            <div class="cover-highlights-mobile-contents">
+                
+                <div class="cover-highlights-mobile-item">
+                    {% if showcase_status %} 
+                        <a href="{% url 'join_quiz' showcase_data.quiz_instance.id %}">
+                    {% else %}
+                        <a href="{% url 'my_quizzes' %}">
+                    {% endif %}
+                    
+                        {% if showcase_status %} 
+                            <img src="{% static 'images/site/join.jpg' %}" alt="Join the showcase quiz...">
+                            <p>Join The Showcase Quiz</p>
+                        {% else %}
+                            <img src="{% static 'images/site/join.jpg' %}" alt="Join one of your quizzes...">
+                            <p>Your Quizzes</p>
+                        {% endif %}
+                        <hr>
+                    </a>
+                </div>
+            
+            
+                <div class="cover-highlights-mobile-item">
+                    <a href="{% url 'browse' %}"> 
+                        <img src="{% static 'images/site/browse.jpg' %}" alt="Browse all available quizzes...">
+                        <p>Browse Quizzes</p>
+                        <hr>
+                    </a>
+                </div>
+            
+            
+                <div class="cover-highlights-mobile-item">
+                    <a href="{% url 'create' %}"> 
+                        <img src="{% static 'images/site/create.jpg' %}" alt="Create your own quiz...">
+                        <p>Create Your Own Quiz</p>
+                        <hr>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+    
+{% endblock %}

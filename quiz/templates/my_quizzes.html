@@ -1,0 +1,1508 @@
+{% extends "layout.html" %}
+
+{% load static %}
+
+{% block title %}
+    My Quizzes
+{% endblock %}
+
+{% block body %}
+    
+    {% if not quizzes and not hosted and not archived and not joined %}
+        <center>
+            <h1>My Quizzes</h1>
+
+            <h3>Get Started On Your Quiz Journey </h3>
+            <p>One you join, create or host a quiz, then you'll find them all here.</p>
+
+            <br>
+
+            <img src="{% static 'images/site/empty-frame.png' %}" style="max-width: 300px; height: auto; display: block;" alt="Empty Page Placeholder">
+        
+            <br><br>
+
+
+            
+            <button class="button button-as-url" style="width: 300px; margin-bottom: 10px;" onclick="redirectToPage(`{% url 'create' %}`)">Create A Quiz</button>
+            &nbsp;
+        
+            <button class="button" style="width: 300px; margin-bottom: 10px;" onclick="redirectToPage(`{% url 'browse' %}`)">Browse Quizzes</button>
+            
+            
+        
+        </center>
+    {% endif %}
+
+    {% if joined %}
+        <div class="myquiz-top-row-container">
+            <div style="display: flex; flex-direction: row; align-items: center;">
+                <div style="flex: 1;">
+                    <h2>My Joined Quizzes</h2>
+                </div>
+                <div id="hide-joined">
+                    <svg width="25" height="25" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" onclick="toggleView('joined-view', 'show-joined', 'hide-joined')">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                    </svg>
+                </div>
+                <div id="show-joined" style="display: none;">
+                    <svg width="25" height="25" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" onclick="toggleView('joined-view', 'hide-joined', 'show-joined')">
+                        <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486z"/>
+                        <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                        <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708"/>
+                    </svg>
+                </div>
+            </div>
+
+
+            <div id="joined-view-top" class="myquiz-top-row-subrow">
+                <div style="font-weight: bold; font-size: 1.2em;">
+                    Player in {{ joined|length}} quiz(zes)
+                </div>
+
+                <div style="margin-left: auto;">
+                    <select id="filter-joined">
+                        <option value="filter-joined" selected>Filter: All</option>
+                        <option value="filter-joined-notstarted">Filter: Not yet started</option>
+                        <option value="filter-joined-inprogress">Filter: In progress</option>
+                        <option value="filter-joined-complete">Filter: Complete</option>
+                    </select>
+                </div>
+                
+            </div>
+        </div>
+
+        <div id="joined-view" class="myquiz-card-container">
+            {% for quiz in joined %}
+                <div class="myquiz-card filter-joined {% if quiz.quiz_step == 0 %}filter-joined-notstarted{% elif quiz.quiz_step == 1  %}filter-joined-inprogress{% else %}filter-joined-complete{% endif %}">
+
+                    <div class="myquiz-card-contents">
+                        
+                        <div class="myquiz-status-container">
+                            {% if quiz.quiz_step == 0 %}
+                                <div class="myquiz-status myquiz-status-orange">NOT YET STARTED</div>    
+                            {% elif quiz.quiz_step == 1  %}
+                                <div class="myquiz-status myquiz-status-blue">IN PROGRESS</div>   
+                            {% else %}
+                            <div class="myquiz-status myquiz-status-green">COMPLETE</div>  
+                            {% endif %}
+                            {% if quiz.play_type == 1 and quiz.host == request.user %}
+                                <div class="myquiz-status myquiz-status-pink">HOST</div>
+                            {% endif %}
+                        </div>
+                        <div class="myquiz-title">
+                            {{ quiz.quiz.title }}
+                        </div>
+                        <div class="myquiz-date">
+                            {% if quiz.play_type == 2 %}
+                                Joined on 
+                            {% else %}
+                                Hosted on  
+                            {% endif %}
+                            {{ quiz.hosted_at|date:"d F Y - H:i"}}
+                        </div>
+                        {% if quiz.quiz.description %}
+                            <div class="myquiz-description">
+                                {{ quiz.quiz.description }}
+                            </div>
+                        {% else %}
+                            <div class="myquiz-description">
+                                <div class="myquiz-novalue-given">
+                                    No description.
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if quiz.host == quiz.quiz.author %}
+                            <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                                AUTHOR AND HOST
+                            </div>
+                            <div class="myquiz-small-text">
+                                {% if quiz.quiz.author.public_host_name %}
+                                    {{ quiz.quiz.author.public_host_name }}
+                                {% else %}
+                                    {{ quiz.quiz.author.username }}
+                                {% endif %}
+                            </div>
+
+                        {% else %}
+
+                            <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                                AUTHOR
+                            </div>
+                            <div class="myquiz-small-text">
+                                {% if quiz.quiz.author.public_host_name %}
+                                    {{ quiz.quiz.author.public_host_name }}
+                                {% else %}
+                                    {{ quiz.quiz.author.username }}
+                                {% endif %}
+                            </div>
+                            <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                                HOST
+                            </div>
+                            <div class="myquiz-small-text">
+                                {% if quiz.host.public_host_name %}
+                                    {{ quiz.host.public_host_name }}
+                                {% else %}
+                                    {{ quiz.host.username}}
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            REVIEWS
+                        </div>
+                        <div id="joined-stars-{{ quiz.quiz.id }}" class="myquiz-small-text" style="display: flex; align-items: center;">
+                            {% if quiz.avg_rating %}
+                                {% if quiz.avg_rating < 2 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 2 and quiz.avg_rating < 3 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg> &nbsp; 
+                                {% elif quiz.avg_rating >= 3 and quiz.avg_rating < 4 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4 and quiz.avg_rating < 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange"viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% endif %}
+                            {% else %}
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                
+                            {% endif %}
+                            ({{ quiz.quiz.quizreviews_set.all|length }})
+                        </div>
+                        {% if quiz.quiz_step == 2 %}
+                            <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                                YOUR REVIEW
+                            </div>
+                            {% if quiz.quiz.author != request.user %}
+                            <div id="star-container-{{ quiz.id }}" class="myquiz-small-text star-container" style="display: flex; align-items: center;">
+                                {% for review in quiz.quiz.quizreviews_set.all %}
+                                    {% if review.user == request.user %}
+                                        <svg id="star-svg1-{{ quiz.id}}" width="16" height="16" fill="orange" class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('1',`{{ quiz.id}}`)" onclick="starVote('1', `{{ quiz.id }}`)">
+                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                        </svg>&nbsp;
+                                        <svg id="star-svg2-{{ quiz.id}}" width="16" height="16" {% if review.rating > 1 %} fill="orange"{%else%}fill="gray"{% endif %} class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('2',`{{ quiz.id}}`)" onclick="starVote('2', `{{ quiz.id }}`)">
+                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                        </svg>&nbsp;
+                                        <svg id="star-svg3-{{ quiz.id}}" width="16" height="16" {% if review.rating > 2 %} fill="orange"{%else%}fill="gray"{% endif %} class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('3',`{{ quiz.id}}`)" onclick="starVote('3', `{{ quiz.id }}`)">
+                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                        </svg>&nbsp;
+                                        <svg id="star-svg4-{{ quiz.id}}" width="16" height="16" {% if review.rating > 3 %} fill="orange"{%else%}fill="gray"{% endif %} class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('4',`{{ quiz.id}}`)" onclick="starVote('4', `{{ quiz.id }}`)">
+                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                        </svg>&nbsp;
+                                        <svg id="star-svg5-{{ quiz.id}}" width="16" height="16" {% if review.rating > 4 %} fill="orange"{%else%}fill="gray"{% endif %} class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('5',`{{ quiz.id}}`)" onclick="starVote('5', `{{ quiz.id }}`)">
+                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                        </svg>&nbsp;
+                                    {% endif %}
+                                {% empty %}
+                                    <svg id="star-svg1-{{ quiz.id}}" width="16" height="16" fill="gray" class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('1',`{{ quiz.id}}`)" onclick="starVote('1', `{{ quiz.id }}`)">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg id="star-svg2-{{ quiz.id}}" width="16" height="16" fill="gray" class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('2',`{{ quiz.id}}`)" onclick="starVote('2', `{{ quiz.id }}`)">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg id="star-svg3-{{ quiz.id}}" width="16" height="16" fill="gray" class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('3',`{{ quiz.id}}`)" onclick="starVote('3', `{{ quiz.id }}`)">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg id="star-svg4-{{ quiz.id}}" width="16" height="16" fill="gray" class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('4',`{{ quiz.id}}`)" onclick="starVote('4', `{{ quiz.id }}`)">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg id="star-svg5-{{ quiz.id}}" width="16" height="16" fill="gray" class="pointer" viewBox="0 0 16 16" onmouseover="starSVG('5', `{{ quiz.id}}`)" onclick="starVote('5', `{{ quiz.id }}`)">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                                <div class="myquiz-small-text" style="display: flex; align-items: center;">
+                                    <svg width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="#E0E0E0" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                </div>
+                            {% endif %}
+
+                        {% endif %}                 
+                        <div class="myquiz-small-title">
+                            QUESTIONS
+                        </div>
+                        <div class="myquiz-small-text">
+                            {{ quiz.quiz.get_question_count }}
+                        </div>
+                        <div class="myquiz-small-title">
+                            CURRENT QUESTION
+                        </div>
+                        <div class="myquiz-small-text">
+                            {{ quiz.question_number }}
+                        </div>
+                        <div class="myquiz-small-title">
+                            CATEGORIES 
+                        </div>
+                        <div class="myquiz-categories-container">
+                            {% if quiz.quiz.category1 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.quiz.category1 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.quiz.category2 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.quiz.category2 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.quiz.category3 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.quiz.category3 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.quiz.category4 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.quiz.category4 }}
+                            </div>
+                            {% endif %}
+                        </div>               
+                    </div>            
+                    
+                    <div class="myquiz-bottom-buttons-container">
+                        <div class="myquiz-bottom-buttons-column">
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                {% if quiz.quiz_step == 0 or quiz.quiz_step == 1  %}
+                                Go To Quiz
+                                {% else %}
+                                See Results
+                                {% endif %}
+                            </div>
+                            <div>
+                                <a href="{% url 'join_quiz' quiz.id %}">
+                                    <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                        <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
+                                    </svg>                           
+                                </a>
+                            </div>
+                        </div>
+                        {% if quiz.quiz_step == 0 or quiz.quiz_step == 1  %}
+                        <div class="myquiz-bottom-buttons-column">                        
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Leave Quiz
+                            </div>
+                            <div>
+                                <form action="{% url 'my_quizzes' %}" method="post">
+                                {% csrf_token %}
+                                    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                    <input type="hidden" name="leave">
+                                    <button type="submit" class="button-svg" style="background-color: transparent;">
+                                        <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" onclick="confirmDelete(event, 'exit_quiz_sess')" >
+                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>                        
+                        </div>
+                        {% endif %}   
+                        {% if quiz.quiz_step == 2 %}
+                            <div class="myquiz-bottom-buttons-column">                        
+                                <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                    Archive
+                                </div>
+                                <div>
+                                    <form action="{% url 'my_quizzes' %}" method="post">
+                                    {% csrf_token %}
+                                        <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                        <input type="hidden" name="archive_participant">
+                                        <button type="submit" class="button-svg" style="background-color: transparent;">
+                                            <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                                <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>                        
+                            </div>
+                        {% endif %}                                
+                    </div>            
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if quizzes%}
+        <div class="myquiz-top-row-container">
+            <div style="display: flex; flex-direction: row; align-items: center;">
+                <div style="flex: 1;">
+                    <h2>My Quizzes Creations</h2>
+                </div>
+                <div id="hide-created">
+                    <svg width="25" height="25" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" onclick="toggleView('created-view', 'show-created', 'hide-created')">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                    </svg>
+                </div>
+                <div id="show-created" style="display: none;">
+                    <svg width="25" height="25" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" onclick="toggleView('created-view', 'hide-created', 'show-created')">
+                        <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486z"/>
+                        <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                        <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708"/>
+                    </svg>
+                </div>
+            </div>
+
+
+            <div id="created-view-top" class="myquiz-top-row-subrow">
+                <div style="font-weight: bold; font-size: 1.2em;">
+                    {{ quizzes|length}} creation(s)
+                </div>
+
+                <div style="margin-left: auto;">
+                    <select id="filter-category">
+                        <option value="class-filter" selected>Filter: All</option>
+                        <option value="class-filter-complete">Filter: Published</option>
+                        <option value="class-filter-inprogress">Filter: Editing</option>
+                    </select>
+                </div>
+                
+            </div>
+        </div>
+    
+    
+        <div id="created-view" class="myquiz-card-container">
+            {% for quiz in quizzes %}
+                <div class="myquiz-card class-filter {% if quiz.complete %}class-filter-complete{% else %}class-filter-inprogress{% endif %}">
+                    
+                    <div class="myquiz-card-contents">
+                        
+                        <div class="myquiz-status-container">
+                            {% if quiz.complete %}
+                                <div class="myquiz-status myquiz-status-green">PUBLISHED</div>    
+                            {% else %}
+                                <div class="myquiz-status myquiz-status-orange">EDITING</div>    
+                            {% endif %}
+                        </div>
+                        <div class="myquiz-title">
+                            {{ quiz.title }}
+                        </div>
+                        <div class="myquiz-date">
+                            {{ quiz.created_on|date:"d F Y"}}
+                        </div>
+                        {% if quiz.description %}
+                            <div class="myquiz-description">
+                                {{ quiz.description }}
+                            </div>
+                        {% else %}
+                            <div class="myquiz-description">
+                                <div class="myquiz-novalue-given">
+                                    No description.
+                                    {% if not quiz.private %}
+                                        <br>Recommended for public quizzes!
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            AUTHOR
+                        </div>
+                        <div class="myquiz-small-text">
+                            You
+                        </div>
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            REVIEWS
+                        </div>
+                        <div id="created-stars-{{ quiz.id }}" class="myquiz-small-text" style="display: flex; align-items: center;">
+                            {% if quiz.avg_rating %}
+                                {% if quiz.avg_rating < 2 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 2 and quiz.avg_rating < 3 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg> &nbsp; 
+                                {% elif quiz.avg_rating >= 3 and quiz.avg_rating < 4 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4 and quiz.avg_rating < 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange"viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% endif %}
+                            {% else %}
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                
+                            {% endif %}
+                            ({{ quiz.quizreviews_set.all|length }})
+                        </div>
+                        <div class="myquiz-small-title">
+                            QUESTIONS
+                        </div>
+                        <div class="myquiz-small-text">
+                            {{ quiz.get_question_count }}
+                        </div>
+                        <div class="myquiz-small-title">
+                            PRIVACY 
+                        </div>
+                        <div class="myquiz-small-text">
+                            {% if quiz.private %}
+                                Private
+                            {% else %}
+                                Public
+                            {% endif %}
+                        </div>
+                        <div class="myquiz-small-title">
+                            CATEGORIES 
+                        </div>
+                        <div class="myquiz-categories-container">
+                            {% if quiz.category1 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category1 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.category2 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category2 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.category3 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category3 }}
+                            </div>
+                            {% endif %}
+                            {% if quiz.category4 %}
+                            <div class="myquiz-categories-item">
+                                {{ quiz.category4 }}
+                            </div>
+                            {% endif %}
+                            {% if not quiz.category1 and not quiz.category2 and not quiz.category3 and not quiz.category4 %}
+                                <div class="myquiz-novalue-given">
+                                    No categories.
+                                    {% if not quiz.private %}
+                                        <br>Recommended for public quizzes!
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="myquiz-bottom-buttons-container">
+                        <div class="myquiz-bottom-buttons-column">
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Manage Quiz
+                            </div>
+                            <div>
+                                <a href="{% url 'quiz_management' quiz_id=quiz.id %}">
+                                    <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+                                    </svg>                           
+                                </a>
+                            </div>
+                        </div>
+                        <div class="myquiz-bottom-buttons-column">
+                            {% if quiz.complete %}
+                                <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                    Create Session
+                                </div>
+                                <div>
+                                    <form action="{% url 'my_quizzes' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                        <input type="hidden" name="host">
+                                        <button type="submit" class="button-svg" style="background-color: transparent;">
+                                            <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                                <path d="M15.384 6.115a.485.485 0 0 0-.047-.736A12.444 12.444 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049z"/>
+                                                <path d="M13.229 8.271a.482.482 0 0 0-.063-.745A9.455 9.455 0 0 0 8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065A8.46 8.46 0 0 1 8 7a8.46 8.46 0 0 1 4.576 1.336c.206.132.48.108.653-.065zm-2.183 2.183c.226-.226.185-.605-.1-.75A6.473 6.473 0 0 0 8 9c-1.06 0-2.062.254-2.946.704-.285.145-.326.524-.1.75l.015.015c.16.16.407.19.611.09A5.478 5.478 0 0 1 8 10c.868 0 1.69.201 2.42.56.203.1.45.07.61-.091zM9.06 12.44c.196-.196.198-.52-.04-.66A1.99 1.99 0 0 0 8 11.5a1.99 1.99 0 0 0-1.02.28c-.238.14-.236.464-.04.66l.706.706a.5.5 0 0 0 .707 0l.707-.707z"/>
+                                            </svg>
+                                        </button>
+                                    </form>                                    
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if hosted %}
+        <div class="myquiz-top-row-container">
+            <div style="display: flex; flex-direction: row; align-items: center;">
+                <div style="flex: 1;">
+                    <h2>My Hosted Creations</h2>
+                </div>
+                <div id="hide-hosted">
+                    <svg width="25" height="25" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" onclick="toggleView('hosted-view', 'show-hosted', 'hide-hosted')">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                    </svg>
+                </div>
+                <div id="show-hosted" style="display: none;">
+                    <svg width="25" height="25" fill="#333" class="pointer svg-hover" viewBox="0 0 16 16" onclick="toggleView('hosted-view', 'hide-hosted', 'show-hosted')">
+                        <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486z"/>
+                        <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                        <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708"/>
+                    </svg>
+                </div>
+            </div>
+
+
+            <div id="hosted-view-top" class="myquiz-top-row-subrow">
+                <div style="font-weight: bold; font-size: 1.2em;">
+                    {{ hosted|length}} hosted quiz session(s)
+                </div>
+
+                <div class="" style="margin-left: auto;">
+                    
+                    <select id="filter-hosted">
+                        <option value="filter-hosted" selected>Filter: All</option>
+                        <option value="filter-hosted-notstarted">Filter: Not Yet Started</option>
+                        <option value="filter-hosted-inprogress">Filter: Quiz Has Started</option>
+                        <option value="filter-hosted-finished">Filter: Finished</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    
+        <div id="hosted-view" class="myquiz-card-container">
+            {% for quiz in hosted %}
+                <div class="myquiz-card filter-hosted  {% if quiz.quiz_step == 0 %}filter-hosted-notstarted{% elif quiz.quiz_step == 1  %}filter-hosted-inprogress{% else %}filter-hosted-finished{% endif %}">
+
+                    <div class="myquiz-card-contents">
+                        
+                        <div class="myquiz-status-container">
+                            {% if quiz.quiz_step == 0 %}
+                                <div class="myquiz-status myquiz-status-orange">NOT YET STARTED</div>    
+                            {% elif quiz.quiz_step == 1  %}
+                                <div class="myquiz-status myquiz-status-blue">QUIZ HAS STARTED</div>   
+                            {% else %}
+                            <div class="myquiz-status myquiz-status-green">FINISHED</div>  
+                            {% endif %}
+                        </div>
+                        <div class="myquiz-title">
+                            {{ quiz.quiz.title }}
+                        </div>
+                        <div class="myquiz-date">
+                            Hosted on {{ quiz.hosted_at|date:"d F Y - H:i"}}
+                        </div>
+                        {% if quiz.quiz.description %}
+                            <div class="myquiz-description">
+                                {{ quiz.quiz.description }}
+                            </div>
+                        {% else %}
+                            <div class="myquiz-description">
+                                <div class="myquiz-novalue-given">
+                                    No description.
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            AUTHOR
+                        </div>
+                        <div class="myquiz-small-text">
+                            {% if quiz.quiz.author == request.user %}
+                                You
+                            {% else %}
+                                {% if quiz.quiz.author.public_host_name %}
+                                    {{ quiz.quiz.author.public_host_name }}
+                                {% else %}
+                                    {{ quiz.quiz.author.username }}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="myquiz-small-title" style="margin-bottom: 3px;">
+                            REVIEWS
+                        </div>
+                        <div id="hosted-stars-{{ quiz.quiz.id }}" class="myquiz-small-text" style="display: flex; align-items: center;">
+                            {% if quiz.avg_rating %}
+                                {% if quiz.avg_rating < 2 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 2 and quiz.avg_rating < 3 %}
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg> &nbsp; 
+                                {% elif quiz.avg_rating >= 3 and quiz.avg_rating < 4 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4 and quiz.avg_rating < 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% elif quiz.avg_rating >= 4.7 %} 
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange"viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                    <svg width="16" height="16" fill="orange" viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                    </svg>&nbsp;
+                                {% endif %}
+                            {% else %}
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                <svg width="16" height="16" fill="gray" viewBox="0 0 16 16">
+                                    <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                </svg>&nbsp;
+                                
+                            {% endif %}
+                            ({{ quiz.quiz.quizreviews_set.all|length }})
+                        </div>
+                        <div class="myquiz-small-title">
+                            QUESTIONS
+                        </div>
+                        <div class="myquiz-small-text">
+                            {{ quiz.quiz.get_question_count }}
+                        </div>
+                        <div class="myquiz-small-title">
+                            CURRENT QUESTION
+                        </div>
+                        <div class="myquiz-small-text">
+                            {{ quiz.question_number }}
+                        </div>
+                        <div class="myquiz-small-title">
+                            QUIZ PARTICIPANT URL (SHARING)
+                        </div>                        
+                    </div>            
+                    
+                    <div class="myquiz-url-shortcut-container">
+                        <div class="myquiz-url-shortcut-left">
+                            <input id="{{ quiz.id }}-url"class="input" style="border: 1px solid #E8532F; border-radius: 5px; margin: 0; padding:10px; " value="{% url 'join_quiz' quiz.id %}" readonly>
+                        </div>
+                        <div id="{{ quiz.id }}-copy" class="myquiz-url-shortcut-right">
+                            <svg width="20" height="20" fill="#333" class="pointer" viewBox="0 0 16 16" onclick="copyTextToClipboard(`{{ quiz.id }}-url`,`{{ quiz.id }}`)">
+                                <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7"/>
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+                                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                            </svg>
+                        </div>
+                        <div id="{{ quiz.id }}-copied" class="myquiz-url-shortcut-right" style="display:none;">
+                            <svg width="20" height="20" fill="green" viewBox="0 0 16 16" onmouseover="this.style.fill='green'">
+                                <path d="M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5z"/>
+                                <path d="M3 2.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 0 0-1h-.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1H12a.5.5 0 0 0 0 1h.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5z"/>
+                                <path d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3Z"/>                              
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="myquiz-bottom-buttons-container">
+                        <div class="myquiz-bottom-buttons-column">
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Host Controls
+                            </div>
+                            <div>
+                                <a href="{% url 'quiz_host' quiz.id %}">
+                                    <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                        <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v3a.5.5 0 0 1-.5.5h-3A1.5 1.5 0 0 0 0 6.5v3A1.5 1.5 0 0 0 1.5 11h3a.5.5 0 0 1 .5.5v3A1.5 1.5 0 0 0 6.5 16h3a1.5 1.5 0 0 0 1.5-1.5v-3a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 0 16 9.5v-3A1.5 1.5 0 0 0 14.5 5h-3a.5.5 0 0 1-.5-.5v-3A1.5 1.5 0 0 0 9.5 0zm1.288 2.34a.25.25 0 0 1 .424 0l.799 1.278A.25.25 0 0 1 8.799 4H7.201a.25.25 0 0 1-.212-.382l.799-1.279Zm0 11.32-.799-1.277A.25.25 0 0 1 7.201 12H8.8a.25.25 0 0 1 .212.383l-.799 1.278a.25.25 0 0 1-.424 0Zm-4.17-4.65-1.279-.798a.25.25 0 0 1 0-.424l1.279-.799A.25.25 0 0 1 4 7.201V8.8a.25.25 0 0 1-.382.212Zm10.043-.798-1.278.799A.25.25 0 0 1 12 8.799V7.2a.25.25 0 0 1 .383-.212l1.278.799a.25.25 0 0 1 0 .424Z"/>
+                                    </svg>                           
+                                </a>
+                            </div>
+                        </div>
+                        {% if quiz.quiz_step == 0 or quiz.quiz_step == 1 %}
+                        <div class="myquiz-bottom-buttons-column">                        
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Delete Session
+                            </div>
+                            <div>
+                                <form action="{% url 'my_quizzes' %}" method="post">
+                                {% csrf_token %}
+                                    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                    <input type="hidden" name="delete">
+                                    <button type="submit" class="button-svg" style="background-color: transparent;">
+                                        <svg width="25" height="25" fill="#333" viewBox="0 0 16 16" onclick="confirmDelete(event, 'del_quiz_sess')" >
+                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>                        
+                        </div>
+                        {% endif %}
+                        {% if quiz.quiz_step == 2 %}
+                        <div class="myquiz-bottom-buttons-column">                        
+                            <div style="margin-bottom: 5px; font-size: 0.8em;">
+                                Archive
+                            </div>
+                            <div>
+                                <form action="{% url 'my_quizzes' %}" method="post">
+                                {% csrf_token %}
+                                    <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+                                    <input type="hidden" name="archive">
+                                    <button type="submit" class="button-svg" style="background-color: transparent;">
+                                        <svg width="25" height="25" fill="#333" viewBox="0 0 16 16">
+                                            <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>                        
+                        </div>
+                        {% endif %}                    
+                    </div>            
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if archived %}
+
+        <div class="myquiz-top-row-container">
+            <div class="myquiz-top-row-subrow" style="align-items: center;">
+                <div>
+                    <h2>My Archived Quizzes ({{archived|length}})</h2>
+                </div>
+                
+                <div class="chevon-mouseover" style="margin-left: auto;" onclick="toggleArchived()">
+                    
+                    <svg id="chevron-down" width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16" style="display: block;">
+                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+
+                    <svg id="chevron-up" width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16" style="display: none;">
+                        <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                    </svg>
+                    
+                </div>
+            </div>            
+        </div>
+
+        <div id="myquiz-archived-container" class="myquiz-archived-container" style="display: none;">
+            
+            <div class="myquiz-top-row-subrow">
+                <div style="font-weight: bold; font-size: 1.2em;">
+                    {{ archived|length }} archived quiz session(s)
+                </div>
+
+                <div style="margin-left: auto;">
+                    
+                    <select id="filter-archive" style="padding: 5px; border: 1px solid #E8532F; margin-bottom: 10px;">
+                        <option value="filter-archive" selected>Filter: All</option>
+                        <option value="filter-archive-participant">Filter: Participant</option>
+                        <option value="filter-archive-host">Filter: Hosted</option>
+                    </select>
+                </div>
+
+            </div>
+
+            {% for quiz in archived %}
+                <div class="myquiz-archived-item filter-archive {% if quiz.host == request.user %}filter-archive-host{% else %}filter-archive-participant{% endif %}">
+                    <div style="margin-right: 10px;">
+                        {% if quiz.host == request.user %}
+                            <svg width="20" height="20" fill="#333" viewBox="0 0 16 16" onmouseover="this.style.fill='#333'">
+                                <path d="M15.384 6.115a.485.485 0 0 0-.047-.736A12.444 12.444 0 0 0 8 3C5.259 3 2.723 3.882.663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049z"/>
+                                <path d="M13.229 8.271a.482.482 0 0 0-.063-.745A9.455 9.455 0 0 0 8 6c-1.905 0-3.68.56-5.166 1.526a.48.48 0 0 0-.063.745.525.525 0 0 0 .652.065A8.46 8.46 0 0 1 8 7a8.46 8.46 0 0 1 4.576 1.336c.206.132.48.108.653-.065zm-2.183 2.183c.226-.226.185-.605-.1-.75A6.473 6.473 0 0 0 8 9c-1.06 0-2.062.254-2.946.704-.285.145-.326.524-.1.75l.015.015c.16.16.407.19.611.09A5.478 5.478 0 0 1 8 10c.868 0 1.69.201 2.42.56.203.1.45.07.61-.091zM9.06 12.44c.196-.196.198-.52-.04-.66A1.99 1.99 0 0 0 8 11.5a1.99 1.99 0 0 0-1.02.28c-.238.14-.236.464-.04.66l.706.706a.5.5 0 0 0 .707 0l.707-.707z"/>
+                            </svg>
+                        {% else %}
+                            {% if quiz.play_type == 2 %}
+                                <svg width="20" height="20" fill="#333" viewBox="0 0 16 16" onmouseover="this.style.fill='#333'">
+                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                </svg>
+                            {% else %}
+                                <svg width="20" height="20" fill="#333" viewBox="0 0 16 16" onmouseover="this.style.fill='#333'">
+                                    <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                                </svg>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="myquiz-archived-item-text">
+                        <div class="myquiz-title">
+                            {{ quiz.quiz.title }} 
+                        </div>
+                        <div class="myquiz-date">
+                            ID: {{ quiz.id }} | Completed: {{ quiz.completed_on|date:"d.m.Y" }} at {{ quiz.completed_on|date:"H:i" }}
+                        </div>
+                        {% if quiz.play_type != 2 %}
+                        <div class="myquiz-teams">
+                            <ul style="margin: 2px 0 0 0; padding: 0;">
+                            {% for participant_data in quiz.additional_data.participants %}
+                                <li style="margin-bottom: 2px;">{{ participant_data|safe }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div style="margin-left: auto; display: flex; align-items: center;">
+                        {% if quiz.host == request.user %}
+                            <a href="{% url 'quiz_host' quiz.id %}">
+                        {% else %}
+                            <a href="{% url 'join_quiz' quiz.id %}">
+                        {% endif %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#333" class="pointer" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    {% endif %}
+    
+    <script>
+
+        // Voting
+        function starVote(score, quiz_id) {
+            
+            let data = {
+                score: score,
+                quiz_instance: quiz_id
+            }
+            fetch('/voting', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({data}),
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();  // Assuming the response is in JSON format
+            })
+            .then(responseData => {
+                // responseData received from the server
+                console.log('Response from server:', responseData);
+
+                // Update historic star data
+                storeOriginalColors(responseData.quiz_id)
+
+                // Update other visuals
+                let joinedStars = document.getElementById(`joined-stars-${responseData.quiz_id2}`);
+                let createdStars = document.getElementById(`created-stars-${responseData.quiz_id2}`);
+                let hostedStars = document.getElementById(`hosted-stars-${responseData.quiz_id2}`);
+                
+                newStarsHTML=""
+                
+                for (let i = 1; i <= 5; i++) {
+                    if (responseData.new_average < i) {
+                        if (responseData.new_average >= 4.7 && i === 5) {
+                            // Append yellow star for the case when newAverage is less than 5 but >= 4.7
+                            newStarsHTML += '<svg width="16" height="16" fill="orange" viewBox="0 0 16 16">' +
+                                            '<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>' +
+                                            '</svg>&nbsp;';
+                        } else {
+                            // Append grey star
+                            newStarsHTML += '<svg width="16" height="16" fill="gray" viewBox="0 0 16 16">' +
+                                            '<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>' +
+                                            '</svg>&nbsp;';
+                        }
+                    } else {
+                        // Append yellow star
+                        newStarsHTML += '<svg width="16" height="16" fill="orange" viewBox="0 0 16 16">' +
+                                        '<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>' +
+                                        '</svg>&nbsp;';
+                    }
+                }
+
+                newStarsHTML += ` (${responseData.total_votes})`
+
+                if (joinedStars) {
+                    joinedStars.innerHTML = newStarsHTML
+                }
+
+                if (createdStars) {
+                    createdStars.innerHTML = newStarsHTML
+                }
+
+                if (hostedStars) {
+                    hostedStars.innerHTML = newStarsHTML
+                }
+
+            })
+            .catch(error => {
+                console.error('Error during PUT request:', error);
+            });
+        }
+
+        
+
+        // Store and reset original Star SVG colours
+        let originalColors = {};
+
+        function storeOriginalColors(setIdentifier) {
+            for (let i = 1; i <= 5; i++) {
+                let star = document.getElementById('star-svg' + i + '-' + setIdentifier);
+                if (star) {
+                    originalColors['star-svg' + i + '-' + setIdentifier] = star.style.fill;
+                }
+            }
+        }
+
+        // Read id's from server
+        {{ joined_quizzes_ids|safe }}
+
+
+        // Call the function for each set
+        for (let i = 0; i < quiz_instances.length; i++) {
+            storeOriginalColors(quiz_instances[i]);
+        }
+
+        function resetColors(id) {
+            for (let i = 1; i <= 5; i++) {
+                let star = document.getElementById('star-svg' + i + '-' + id);
+                if (star) {
+                    star.style.fill = originalColors['star-svg' + i  + '-' + id];
+                } else {
+                    console.error('SVG element not found: star-svg' + i  + '-' + id);
+                }
+            }
+        }
+
+        // Change Star SVG colour
+        function starSVG(id1, id2) {
+            for (let i = 1; i <= 5; i++) {
+                let star = document.getElementById('star-svg' + i + `-${id2}`);
+                if (star) {
+                    if (i <= id1) {
+                        star.style.fill = 'orange';
+                    } else {
+                        star.style.fill = 'gray';
+                    }
+                }
+            }
+        }
+
+        let starContainers = document.getElementsByClassName('star-container');
+
+        for (let i = 0; i < starContainers.length; i++) {
+            starContainers[i].addEventListener('mouseleave', function(event) {
+                // Get the ID of the star-container where the event occurred
+                let containerId = event.currentTarget.id;
+
+                let parts = containerId.split('-');
+                let finalDigits = parts[parts.length - 1];
+
+                // Now you can use the containerId as needed, for example:
+                resetColors(finalDigits);
+            });
+        }
+
+
+        // Toggle archived area and change chevron SVG
+        function toggleArchived() {
+            let show = document.getElementById('myquiz-archived-container');
+            let chevonUp = document.getElementById('chevron-up');
+            let chevonDown = document.getElementById('chevron-down');
+
+            if (show.style.display === 'none') {
+                show.style.display = 'flex';
+                chevonUp.style.display = 'block';
+                chevonDown.style.display = 'none';
+
+            } else {
+                show.style.display = 'none';
+                chevonUp.style.display = 'none';
+                chevonDown.style.display = 'block';
+            }    
+        }
+
+        // Toggle different elemenets
+        function toggleView(toggle, show, hide) {
+
+            let toggleElement = document.getElementById(toggle)
+            let toggleElement2 = document.getElementById(toggle + '-top')
+            let showElement = document.getElementById(show)
+            let hideElement = document.getElementById(hide)
+
+            if (toggleElement.style.display === 'flex' || toggleElement.style.display === "" ) {
+                toggleElement.style.display = 'none';
+                toggleElement2.style.display = 'none';
+
+            } else {
+                toggleElement.style.display = 'flex';
+                toggleElement2.style.display = 'flex';
+            }
+
+            showElement.style.display = 'block';
+            hideElement.style.display = 'none';
+
+        }
+
+
+        // Copy to clipboard
+        function copyTextToClipboard(divID, svgID) {
+
+            let textToCopy = document.getElementById(`${divID}`).value;
+            let tempInput = document.createElement('input');
+
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+
+            /* Remove the temporary input element */
+            document.body.removeChild(tempInput);
+
+            /* Change SVG */
+            let hideSVG = document.getElementById(`${svgID}-copy`)            
+            let showSVG = document.getElementById(`${svgID}-copied`)
+
+            hideSVG.style.display = 'none';
+            showSVG.style.display = 'inline-block';
+        }
+
+        // Category filter for 'my joined creations'
+
+        let filterJoinedElement = document.getElementById('filter-joined');
+
+        if (filterJoinedElement) {
+            document.getElementById('filter-joined').addEventListener('change', function() {
+            
+            let selectedOption = this.value;
+    
+            // Get all elements with the class 'filter-joined'
+            let allDivs = document.getElementsByClassName('filter-joined');
+
+		    if (selectedOption === 'filter-joined-notstarted') {
+
+                let notstartedDivs = document.getElementsByClassName('filter-joined-notstarted');
+                
+                // Hide all content divs
+                for (let i = 0; i < allDivs.length; i++) {
+                    allDivs[i].style.display = 'none';
+                }
+
+                // Show all content divs
+                for (let i = 0; i < notstartedDivs.length; i++) {
+                    notstartedDivs[i].style.display = 'flex';
+                }
+
+            } else if (selectedOption === 'filter-joined-inprogress') {
+
+                let inprogressDivs = document.getElementsByClassName('filter-joined-inprogress');
+                
+                // Hide all content divs
+                for (let i = 0; i < allDivs.length; i++) {
+                    allDivs[i].style.display = 'none';
+                }
+
+                // Show all content divs
+                for (let i = 0; i < inprogressDivs.length; i++) {
+                    inprogressDivs[i].style.display = 'flex';
+                }
+
+            } else if (selectedOption === 'filter-joined-complete') {
+
+                let completeDivs = document.getElementsByClassName('filter-joined-complete');
+
+                // Hide all content divs
+                for (let i = 0; i < allDivs.length; i++) {
+                    allDivs[i].style.display = 'none';
+                }
+
+                // Show all content divs
+                for (let i = 0; i < completeDivs.length; i++) {
+                    completeDivs[i].style.display = 'flex';
+                }
+
+            } else {
+                // Show all content divs
+                for (let i = 0; i < allDivs.length; i++) {
+                    allDivs[i].style.display = 'flex';
+                }
+            }
+    
+            });
+
+        }
+        
+
+        let filterCreatedElement = document.getElementById('filter-category');
+
+        if (filterCreatedElement) {
+
+            // Category filter for 'my quiz creations'
+            document.getElementById('filter-category').addEventListener('change', function() {
+
+                let selectedOption = this.value;
+        
+                // Get all elements with the class 'class-filter'
+                let allDivs = document.getElementsByClassName('class-filter');
+
+                if (selectedOption === 'class-filter-inprogress') {
+
+                    let inprogressDivs = document.getElementsByClassName('class-filter-inprogress');
+                    
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < inprogressDivs.length; i++) {
+                        inprogressDivs[i].style.display = 'flex';
+                    }
+
+                } else if (selectedOption === 'class-filter-complete') {
+
+                    let completeDivs = document.getElementsByClassName('class-filter-complete');
+
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < completeDivs.length; i++) {
+                        completeDivs[i].style.display = 'flex';
+                    }
+
+                } else {
+                    // Show all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'flex';
+                    }
+                }
+        
+            });
+        }
+
+        let filterHostedElement = document.getElementById('filter-hosted');
+
+        if (filterHostedElement) {
+
+            // Category filter for 'my hosted quizzes'
+            document.getElementById('filter-hosted').addEventListener('change', function() {
+                let selectedOption = this.value;
+        
+                // Get all elements with the class 'class-filter'
+                let allDivs = document.getElementsByClassName('filter-hosted');
+
+                if (selectedOption === 'filter-hosted-inprogress') {
+
+                    let inprogressDivs = document.getElementsByClassName('filter-hosted-inprogress');
+                    
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < inprogressDivs.length; i++) {
+                        inprogressDivs[i].style.display = 'flex';
+                    }
+
+                } else if (selectedOption === 'filter-hosted-notstarted') {
+
+                    let notStartedDivs = document.getElementsByClassName('filter-hosted-notstarted');
+
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < notStartedDivs.length; i++) {
+                        notStartedDivs[i].style.display = 'flex';
+                    }
+
+                } else if (selectedOption === 'filter-hosted-finished') {
+
+                    let finishedDivs = document.getElementsByClassName('filter-hosted-finished');
+
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < finishedDivs.length; i++) {
+                        finishedDivs[i].style.display = 'flex';
+                    }
+
+
+                } else {
+                    // Show all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'flex';
+                    }
+                }
+    
+            });
+        }
+
+        let filterArchivedElement = document.getElementById('filter-archive');
+
+        if (filterArchivedElement) {
+
+            // Category filter for 'my quiz creations'
+            document.getElementById('filter-archive').addEventListener('change', function() {
+                let selectedOption = this.value;
+        
+                // Get all elements with the class 'class-filter'
+                let allDivs = document.getElementsByClassName('filter-archive');
+
+                if (selectedOption === 'filter-archive-host') {
+
+                    let archiveHostDivs = document.getElementsByClassName('filter-archive-host');
+                    
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < archiveHostDivs.length; i++) {
+                        archiveHostDivs[i].style.display = 'flex';
+                    }
+
+                } else if (selectedOption === 'filter-archive-participant') {
+
+                    let archivePartDivs = document.getElementsByClassName('filter-archive-participant');
+
+                    // Hide all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'none';
+                    }
+
+                    // Show all content divs
+                    for (let i = 0; i < archivePartDivs.length; i++) {
+                        archivePartDivs[i].style.display = 'flex';
+                    }
+
+                } else {
+                    // Show all content divs
+                    for (let i = 0; i < allDivs.length; i++) {
+                        allDivs[i].style.display = 'flex';
+                    }
+                }
+        
+            });
+        }
+
+    </script>
+
+{% endblock %}
